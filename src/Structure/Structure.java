@@ -35,6 +35,73 @@ public class Structure {
 //			in = sc.nextLine();
 //		}
 //	}
+
+	static public Structure readFile(String dir) throws FileNotFoundException, WrongFileFormatException {
+		int[][] matrix = null;
+		double[][] euclid = null;
+		int dimension = 0;
+		Scanner sc = new Scanner(new File(dir));
+		String format = "", edge_weight_type = "";
+		while (sc.hasNextLine()) {
+			String in = sc.nextLine();
+			String[] arr = in.split(" ");
+			if (in.startsWith("TYPE")) {
+				if (!Objects.equals(arr[arr.length-1], "ATSP") && !Objects.equals(arr[arr.length - 1], "TSP")) {
+					System.out.println("type");
+					break;
+				}
+			} else if (in.startsWith("DIMENSION")) {
+				dimension =  Integer.parseInt(arr[1]);
+			} else if (in.startsWith("EDGE_WEIGHT_TYPE")) {
+				edge_weight_type = arr[arr.length-1];
+				if (!Objects.equals(edge_weight_type, "EUC_2D") && !Objects.equals(edge_weight_type, "EXPLICIT")) {
+					System.out.println("edge_weight_type");
+					break;
+				}
+			} else if (in.startsWith("EDGE_WEIGHT_FORMAT") && Objects.equals(edge_weight_type, "EXPLICIT")) {
+				format = arr[arr.length-1];
+				if (!Objects.equals(format, "FULL_MATRIX") && !Objects.equals(format, "LOWER_DIAG_ROW")) {
+					System.out.println("format");
+					break;
+				}
+			} else if ((in.startsWith("NODE_COORD_SECTION") || in.startsWith("DISPLAY_DATA_SECTION")) && dimension > 0) {
+				euclid = new double[dimension][2];
+				for (int i = 0; i < dimension; i++) {
+					sc.nextInt();
+					euclid[i][0] = sc.nextDouble();
+					euclid[i][1] = sc.nextDouble();
+				}
+			} else if (in.startsWith("EDGE_WEIGHT_SECTION") && dimension > 0) {
+				if (Objects.equals(format, "FULL_MATRIX")) {
+					matrix = new int[dimension][dimension];
+					for (int i = 0; i < dimension; i++) {
+						for (int j = 0; j < dimension; j++) {
+							matrix[i][j] = sc.nextInt();
+						}
+					}
+				} else if (Objects.equals(format, "LOWER_DIAG_ROW")) {
+					matrix = new int[dimension][dimension];
+					for (int i = 0; i < dimension; i++) {
+						for (int j = 0; j <= i; j++) {
+							matrix[i][j] = sc.nextInt();
+							matrix[j][i] = matrix[i][j];
+						}
+					}
+				}
+			}
+		}
+		if (matrix == null && euclid == null) {
+			throw new WrongFileFormatException();
+		}
+		if (euclid != null) {
+			if (matrix == null) {
+				return new Euklides(dimension, euclid);
+			}
+			return new Euklides(dimension, euclid, matrix);
+		}
+		return new Matrix(dimension, matrix);
+	}
+
 	static public void writeData(Structure structure, String dir) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(dir);
 
@@ -59,5 +126,9 @@ public class Structure {
 			}
 		}
 		writer.close();
+	}
+
+	public int getDimension() {
+		return dimension;
 	}
 }

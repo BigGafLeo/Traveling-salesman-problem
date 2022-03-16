@@ -1,20 +1,18 @@
 package Structure;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Random;
-import java.util.Scanner;
 
-final public class Matrix extends Structure {
-
+public class Matrix extends Structure {
 
 	protected int[][] matrix;
 	boolean symmetric;
 
 	public Matrix(int n, int[][] matrix) {
 		this.dimension = n;
-		matrix = new int[n][n];
+		this.matrix = matrix;
 	}
+
+	public Matrix(){}
 
 	public void randomSymmetricGenerateMatrix(int newDimension, int limit) {
 		dimension = newDimension;
@@ -29,6 +27,7 @@ final public class Matrix extends Structure {
 			}
 		}
 	}
+
 	public void randomAsymmetricGenerateMatrix(int newDimension, int limit) {
 		dimension = newDimension;
 		symmetric = false;
@@ -42,6 +41,7 @@ final public class Matrix extends Structure {
 			}
 		}
 	}
+
 	public int distance(int[] tab) {
 		int distance = 0;
 		for (int i = 1; i < dimension; i++) {
@@ -50,6 +50,11 @@ final public class Matrix extends Structure {
 		distance += matrix[tab[dimension - 1]][tab[0]];
 		return distance;
 	}
+
+	public int get(int i, int j) {
+		return matrix[i][j];
+	}
+
 	boolean isSymmetric(){return symmetric;}
 
 }

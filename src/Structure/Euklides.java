@@ -5,10 +5,20 @@ import java.util.Random;
 final public class Euklides extends Matrix {
 	private double[][] euclid;
 
-	public Euklides(int n) {
-		tab = new int[n][2];
+	public Euklides(int n, double[][] euclid) {
+		dimension = n;
+		this.euclid = euclid;
+		euclidToMatrix();
 	}
+
+	public Euklides(int n, double[][] euclid, int[][] matrix) {
+		dimension = n;
+		this.euclid = euclid;
+		this.matrix = matrix;
+	}
+
 	public Euklides(){}
+
 	public void randomGenerateEuklides(int newDimension, double limit)
 	{
 		dimension = newDimension;
@@ -20,6 +30,7 @@ final public class Euklides extends Matrix {
 		}
 		euclidToMatrix();
 	}
+
 	public void euclidToMatrix() {
 		matrix = new int[dimension][dimension];
 		for (int i = 0; i < dimension; i++) {
@@ -30,8 +41,9 @@ final public class Euklides extends Matrix {
 			}
 		}
 	}
-	public double getX(int position){return euclid[position][0];}
-	public double getY(int position){return euclid[position][1];}
 
+	public double getX(int position){return euclid[position][0];}
+
+	public double getY(int position){return euclid[position][1];}
 }
 

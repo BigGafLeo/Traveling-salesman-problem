@@ -2,10 +2,11 @@ package Structure;
 
 import java.util.Random;
 
-public class Matrix extends Structure {
+public class Matrix {
 
+	protected int dimension;
 	protected int[][] matrix;
-	boolean symmetric;
+	private boolean symmetric;
 
 	public Matrix(int n, int[][] matrix) {
 		this.dimension = n;
@@ -55,6 +56,11 @@ public class Matrix extends Structure {
 		return matrix[i][j];
 	}
 
-	boolean isSymmetric(){return symmetric;}
+	public boolean isSymmetric() {
+		return symmetric;
+	}
 
+	public int getDimension() {
+		return dimension;
+	}
 }

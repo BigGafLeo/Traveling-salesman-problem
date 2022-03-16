@@ -1,12 +1,9 @@
 import Structure.Euklides;
 import Structure.Matrix;
-import Structure.Structure;
-
-import java.util.Scanner;
 
 public class Main {
 
-    private Structure structure;
+    private Matrix structure;
     //private int solution[];
 
     public static void main(String[] args) {
@@ -16,7 +13,7 @@ public class Main {
 //            Structure.readFile(sc.nextLine());
 //            for (int i = 0; i < main.structure.getDimension(); i++) {
 //                for (int j = 0; j < main.structure.getDimension(); j++) {
-//                    System.out.print(((Matrix) main.structure).get(i, j) + " ");
+//                    System.out.print(main.structure.get(i, j) + " ");
 //                }
 //                System.out.println();
 //            }
@@ -33,7 +30,7 @@ public class Main {
         ((Euklides)main.structure).randomGenerateEuklides(30, 1000);
         for (int i = 0; i < main.structure.getDimension(); i++) {
                 for (int j = 0; j < main.structure.getDimension(); j++) {
-                    System.out.print(((Euklides) main.structure).get(i, j) + " ");
+                    System.out.print(main.structure.get(i, j) + " ");
                 }
                 System.out.println();
             }

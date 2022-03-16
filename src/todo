@@ -9,11 +9,11 @@ Wotjek = Matrix
 
 
 Gnatowski:
-Struktury danych dla instancji problemu (forma euklidesowa/macierz odległości) oraz rozwiązania.
+Struktury danych dla instancji problemu (forma euklidesowa/macierz odległości) oraz rozwiązania.!
 
-Metoda wczytywania i zapisywania instancji + rozwiązań. Należy obsługiwać import z TSPLIB, instancje sprecyzowane w dokumencie.
+Metoda wczytywania i zapisywania instancji + rozwiązań. Należy obsługiwać import z TSPLIB, instancje sprecyzowane w dokumencie.!
 
-Metoda generowania losowego instancji (co najmniej jedna).
+Metoda generowania losowego instancji (co najmniej jedna).!
 
 Napisanie funkcji celu.
 

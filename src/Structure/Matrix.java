@@ -2,18 +2,54 @@ package Structure;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Random;
 import java.util.Scanner;
 
 final public class Matrix extends Structure {
 
 
-	private int[][] matrix;
+	protected int[][] matrix;
+	boolean symmetric;
 
-
-	public Matrix(int n) {
+	public Matrix(int n, int[][] matrix) {
 		this.dimension = n;
 		matrix = new int[n][n];
 	}
 
+	public void randomSymmetricGenerateMatrix(int newDimension, int limit) {
+		dimension = newDimension;
+		symmetric = true;
+		Random random = new Random();
+		matrix = new int[newDimension][newDimension];
+		for (int i = 0; i < newDimension; i++) {
+			matrix[i][i] = 0;
+			for (int j = i + 1; j < newDimension; j++) {
+				matrix[i][j] = random.nextInt(limit);
+				matrix[j][i] = matrix[i][j];
+			}
+		}
+	}
+	public void randomAsymmetricGenerateMatrix(int newDimension, int limit) {
+		dimension = newDimension;
+		symmetric = false;
+		Random random = new Random();
+		matrix = new int[newDimension][newDimension];
+		for (int i = 0; i < newDimension; i++) {
+			matrix[i][i] = 0;
+			for (int j = i + 1; j < newDimension; j++) {
+				matrix[i][j] = random.nextInt(limit);
+				matrix[j][i] = random.nextInt(limit);
+			}
+		}
+	}
+	public int distance(int[] tab) {
+		int distance = 0;
+		for (int i = 1; i < dimension; i++) {
+			distance += matrix[tab[i-1]][tab[i]];
+		}
+		distance += matrix[tab[dimension - 1]][tab[0]];
+		return distance;
+	}
+	boolean isSymmetric(){return symmetric;}
 
 }

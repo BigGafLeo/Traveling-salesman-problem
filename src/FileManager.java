@@ -24,7 +24,7 @@ public class FileManager {
 					break;
 				}
 			} else if (in.startsWith("DIMENSION")) {
-				dimension =  Integer.parseInt(arr[1]);
+				dimension =  Integer.parseInt(arr[arr.length - 1]);
 			} else if (in.startsWith("EDGE_WEIGHT_TYPE")) {
 				edge_weight_type = arr[arr.length-1];
 				if (!Objects.equals(edge_weight_type, "EUC_2D") && !Objects.equals(edge_weight_type, "EXPLICIT")) {

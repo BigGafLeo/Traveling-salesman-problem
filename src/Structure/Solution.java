@@ -7,6 +7,7 @@ public class Solution {
 	private int[] solutionQue;
 	private final Matrix matrix;
 	private int distance;
+
 	
 	public Solution(Matrix matrix)
 	{	

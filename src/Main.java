@@ -1,5 +1,8 @@
 import Structure.Euklides;
 import Structure.Matrix;
+import Structure.Solution;
+
+import java.util.Scanner;
 
 public class Main {
 
@@ -29,14 +32,18 @@ public class Main {
         main.structure = new Euklides();
         ((Euklides)main.structure).randomGenerateEuklides(30, 1000);
         for (int i = 0; i < main.structure.getDimension(); i++) {
-                for (int j = 0; j < main.structure.getDimension(); j++) {
-                    System.out.print(main.structure.get(i, j) + " ");
-                }
-                System.out.println();
+            for (int j = 0; j < main.structure.getDimension(); j++) {
+                System.out.print(main.structure.get(i, j) + " ");
             }
-            System.out.println("\n\n\n\n");
-            if (main.structure instanceof Euklides)
-                for(int i =0; i < main.structure.getDimension(); i++)
-                    System.out.println(i+" "+((Euklides)main.structure).getX(i)+" "+((Euklides)main.structure).getY(i));
+            System.out.println();
+        }
+        System.out.println("\n\n\n\n");
+        if (main.structure instanceof Euklides)
+            for(int i =0; i < main.structure.getDimension(); i++)
+                System.out.println(i+" "+((Euklides)main.structure).getX(i)+" "+((Euklides)main.structure).getY(i));
+    */
+        main.solution = new Solution(main.structure);
+        main.solution.kRandom();
+        System.out.println(main.solution.toString());
     }
 }

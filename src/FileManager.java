@@ -41,8 +41,8 @@ public class FileManager {
 				euclid = new double[dimension][2];
 				for (int i = 0; i < dimension; i++) {
 					sc.nextInt();
-					euclid[i][0] = sc.nextDouble();
-					euclid[i][1] = sc.nextDouble();
+					euclid[i][0] = Double.parseDouble(sc.next());//sc.nextDouble();
+					euclid[i][1] = Double.parseDouble(sc.next());//sc.nextDouble();
 				}
 			} else if (in.startsWith("EDGE_WEIGHT_SECTION") && dimension > 0) {
 				if (Objects.equals(format, "FULL_MATRIX")) {

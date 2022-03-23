@@ -46,9 +46,9 @@ public class Matrix {
 	public int distance(int[] tab) {
 		int distance = 0;
 		for (int i = 1; i < dimension; i++) {
-			distance += matrix[tab[i-1]][tab[i]];
+			distance += matrix[tab[i-1] - 1][tab[i] - 1];
 		}
-		distance += matrix[tab[dimension - 1]][tab[0]];
+		distance += matrix[tab[dimension - 1] - 1][tab[0] - 1];
 		return distance;
 	}
 

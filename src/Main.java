@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Main {
 
     private Matrix structure;
-    //private int solution[];
+    private Solution solution;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -29,8 +29,8 @@ public class Main {
 //            System.out.println(ex);
 //            ex.printStackTrace();
 //        }
-        main.structure = new Euklides();
-        ((Euklides)main.structure).randomGenerateEuklides(30, 1000);
+        main.structure = new Matrix();
+        main.structure.randomAsymmetricGenerateMatrix(5, 10000);
         for (int i = 0; i < main.structure.getDimension(); i++) {
             for (int j = 0; j < main.structure.getDimension(); j++) {
                 System.out.print(main.structure.get(i, j) + " ");
@@ -41,9 +41,8 @@ public class Main {
         if (main.structure instanceof Euklides)
             for(int i =0; i < main.structure.getDimension(); i++)
                 System.out.println(i+" "+((Euklides)main.structure).getX(i)+" "+((Euklides)main.structure).getY(i));
-    */
         main.solution = new Solution(main.structure);
-        main.solution.kRandom();
+        main.solution.twoOpt();
         System.out.println(main.solution.toString());
     }
 }

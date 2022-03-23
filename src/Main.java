@@ -11,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-        /*Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         try {
             main.structure = FileManager.readFile(sc.nextLine());
             for (int i = 0; i < main.structure.getDimension(); i++) {
@@ -28,14 +28,14 @@ public class Main {
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();
-        }*/
-        main.structure = new Euklides();
+        }
+        /*main.structure = new Euklides();
         ((Euklides)main.structure).randomGenerateEuklides(30, 1000);
         try {
             FileManager.writeData(main.structure, "costam.atsp");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         /*for (int i = 0; i < main.structure.getDimension(); i++) {
                 for (int j = 0; j < main.structure.getDimension(); j++) {
                     System.out.print(main.structure.get(i, j) + " ");

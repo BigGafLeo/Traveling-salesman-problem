@@ -1,6 +1,5 @@
 import Structure.AsymmetricProblemSolver;
 import Structure.Matrix;
-import Structure.ProblemSolver;
 import Structure.SymmetricProblemSolver;
 
 import java.io.File;
@@ -16,7 +15,9 @@ public class Tests {
         //[0] - random
         //[1] - nearest
         //[2] - 2-opt
+        assert tsp_files != null;
         double[][] tsp_distance = new double[3][tsp_files.length];
+        assert atsp_files != null;
         double[][] atsp_distance = new double[3][atsp_files.length];
         Matrix matrix;
 
@@ -29,10 +30,10 @@ public class Tests {
                 AsymmetricProblemSolver asymmetricProblemSolver = new AsymmetricProblemSolver(matrix);
                 asymmetricProblemSolver.kRandom(1000);
                 atsp_distance[0][i] = asymmetricProblemSolver.getDistance();
-                asymmetricProblemSolver.setDistance(0);
                 asymmetricProblemSolver.nearestNeighbour();
                 atsp_distance[1][i] = asymmetricProblemSolver.getDistance();
-                asymmetricProblemSolver.setDistance(0);
+                asymmetricProblemSolver.twoOpt();
+                atsp_distance[2][i] = asymmetricProblemSolver.getDistance();
             } catch (FileNotFoundException | WrongFileFormatException e) {
                 e.printStackTrace();
             }

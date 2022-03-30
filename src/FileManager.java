@@ -14,13 +14,13 @@ public class FileManager {
 		double[][] euclid = null;
 		int dimension = 0;
 		Scanner sc = new Scanner(new File(dir));
-		String format = "", edge_weight_type = "";
+		String format = "", edge_weight_type = "", type = "";
 		while (sc.hasNextLine()) {
 			String in = sc.nextLine();
 			String[] arr = in.split(" ");
 			if (in.startsWith("TYPE")) {
-				if (!Objects.equals(arr[arr.length-1], "ATSP") && !Objects.equals(arr[arr.length - 1], "TSP")) {
-					System.out.println("type");
+				type = arr[arr.length - 1];
+				if (!Objects.equals(type, "ATSP") && !Objects.equals(type, "TSP")) {
 					break;
 				}
 			} else if (in.startsWith("DIMENSION")) {
@@ -28,13 +28,11 @@ public class FileManager {
 			} else if (in.startsWith("EDGE_WEIGHT_TYPE")) {
 				edge_weight_type = arr[arr.length-1];
 				if (!Objects.equals(edge_weight_type, "EUC_2D") && !Objects.equals(edge_weight_type, "EXPLICIT")) {
-					System.out.println("edge_weight_type");
 					break;
 				}
 			} else if (in.startsWith("EDGE_WEIGHT_FORMAT") && Objects.equals(edge_weight_type, "EXPLICIT")) {
 				format = arr[arr.length-1];
 				if (!Objects.equals(format, "FULL_MATRIX") && !Objects.equals(format, "LOWER_DIAG_ROW")) {
-					System.out.println("format");
 					break;
 				}
 			} else if ((in.startsWith("NODE_COORD_SECTION") || in.startsWith("DISPLAY_DATA_SECTION")) && dimension > 0) {
@@ -72,7 +70,7 @@ public class FileManager {
 			}
 			return new Euklides(dimension, euclid, matrix);
 		}
-		return new Matrix(dimension, matrix);
+		return new Matrix(dimension, matrix, type.equals("TSP"));
 	}
 
 	static public void writeData(Matrix structure, String dir) throws FileNotFoundException {

@@ -6,18 +6,22 @@ final public class Euklides extends Matrix {
 	private double[][] euclid;
 
 	public Euklides(int n, double[][] euclid) {
+		symmetric = true;
 		dimension = n;
 		this.euclid = euclid;
 		euclidToMatrix();
 	}
 
 	public Euklides(int n, double[][] euclid, int[][] matrix) {
+		symmetric = true;
 		dimension = n;
 		this.euclid = euclid;
 		this.matrix = matrix;
 	}
 
-	public Euklides(){}
+	public Euklides() {
+		symmetric = true;
+	}
 
 	public void randomGenerateEuklides(int newDimension, double limit)
 	{

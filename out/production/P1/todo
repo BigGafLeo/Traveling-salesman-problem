@@ -1,0 +1,20 @@
+W zależności od type/format wywołana odpowiednia metoda wczytywania (matrix/euklides)
+Po kolei wczytywanie intów przy nextint() -> struktur
+karol = euklides
+Wotjek = Matrix
+
+(zmienne wypisać)->{ metoda generacji};
+
+
+
+
+Gnatowski:
+Struktury danych dla instancji problemu (forma euklidesowa/macierz odległości) oraz rozwiązania.!
+
+Metoda wczytywania i zapisywania instancji + rozwiązań. Należy obsługiwać import z TSPLIB, instancje sprecyzowane w dokumencie.!
+
+Metoda generowania losowego instancji (co najmniej jedna).!
+
+Napisanie funkcji celu.
+
+(Opcja) Dla komiwojażera euklidesowego, metoda wizualizacji instancji i rozwiązania.

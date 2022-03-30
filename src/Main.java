@@ -1,13 +1,11 @@
-import Structure.Euklides;
-import Structure.Matrix;
-import Structure.Solution;
+import Structure.*;
 
-import java.util.Scanner;
+import java.util.Objects;
 
 public class Main {
 
     private Matrix structure;
-    private Solution solution;
+    private ProblemSolver problemSolver;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -30,7 +28,7 @@ public class Main {
 //            ex.printStackTrace();
 //        }
         main.structure = new Matrix();
-        main.structure.randomAsymmetricGenerateMatrix(5, 10000);
+        main.structure.randomAsymmetricGenerateMatrix(8, 10000);
         for (int i = 0; i < main.structure.getDimension(); i++) {
             for (int j = 0; j < main.structure.getDimension(); j++) {
                 System.out.print(main.structure.get(i, j) + " ");
@@ -41,8 +39,10 @@ public class Main {
         if (main.structure instanceof Euklides)
             for(int i =0; i < main.structure.getDimension(); i++)
                 System.out.println(i+" "+((Euklides)main.structure).getX(i)+" "+((Euklides)main.structure).getY(i));
-        main.solution = new Solution(main.structure);
-        main.solution.twoOpt();
-        System.out.println(main.solution.toString());
+        main.problemSolver = main.structure.isSymmetric() ? new SymmetricProblemSolver(main.structure)
+                : new AsymmetricProblemSolver(main.structure);
+        main.problemSolver.kRandom(100);
+        System.out.println(main.problemSolver.toString());
+        main.problemSolver.kOpt(3);
     }
 }

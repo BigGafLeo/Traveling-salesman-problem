@@ -6,14 +6,15 @@ public class Matrix {
 
 	protected int dimension;
 	protected int[][] matrix;
-	private boolean symmetric;
+	protected boolean symmetric;
 
-	public Matrix(int n, int[][] matrix) {
+	public Matrix(int n, int[][] matrix, boolean symmetric) {
 		this.dimension = n;
 		this.matrix = matrix;
+		this.symmetric = symmetric;
 	}
 
-	public Matrix(){}
+	public Matrix() {}
 
 	public void randomSymmetricGenerateMatrix(int newDimension, int limit) {
 		dimension = newDimension;

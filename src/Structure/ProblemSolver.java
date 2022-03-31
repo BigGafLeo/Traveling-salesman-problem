@@ -40,6 +40,7 @@ public abstract class ProblemSolver {
 		int[] bestSolution;
 		int bestDistance = distance;
 		bestSolution = solution.clone();
+
 		for (int i = 1; i < k; i++) {
 			randomPermutation();
 			if(bestDistance > distance) {
@@ -105,6 +106,7 @@ public abstract class ProblemSolver {
 		}
 		int[] edgesToCut = new int[2];
 		boolean changes;
+
 		do {
 			changes = cutEdges(edgesToCut);
 			if (changes) {

@@ -4,6 +4,7 @@ import Structure.SymmetricProblemSolver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 
 public class Tests {
 
@@ -26,7 +27,7 @@ public class Tests {
         for(int i = 0 ; i < atsp_files.length; i++)
         {
             try {
-                matrix = FileManager.readFile(atsp_files[i]);
+                matrix = FileManager.readFile("data/ALL_atsp/" + atsp_files[i]);
                 AsymmetricProblemSolver asymmetricProblemSolver = new AsymmetricProblemSolver(matrix);
                 asymmetricProblemSolver.kRandom(1000);
                 atsp_distance[0][i] = asymmetricProblemSolver.getDistance();
@@ -37,13 +38,19 @@ public class Tests {
             } catch (FileNotFoundException | WrongFileFormatException e) {
                 e.printStackTrace();
             }
-
+            System.out.println("Przynajmniej cos sie dzieje");
         }
         for(int i = 0 ; i < tsp_files.length; i++)
         {
             try {
-                matrix = FileManager.readFile(atsp_files[i]);
+                matrix = FileManager.readFile("data/ALL_tsp/" + tsp_files[i]);
                 SymmetricProblemSolver symmetricProblemSolver = new SymmetricProblemSolver(matrix);
+                symmetricProblemSolver.kRandom(1000);
+                tsp_distance[0][i] = symmetricProblemSolver.getDistance();
+                symmetricProblemSolver.nearestNeighbour();
+                tsp_distance[1][i] = symmetricProblemSolver.getDistance();
+                symmetricProblemSolver.twoOpt();
+                tsp_distance[2][i] = symmetricProblemSolver.getDistance();
             } catch (FileNotFoundException | WrongFileFormatException e) {
                 e.printStackTrace();
             }

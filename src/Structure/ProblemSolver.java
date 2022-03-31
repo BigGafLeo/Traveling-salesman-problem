@@ -42,7 +42,6 @@ public abstract class ProblemSolver {
 		bestSolution = solution.clone();
 		for (int i = 1; i < k; i++) {
 			randomPermutation();
-			System.out.println(this);
 			if(bestDistance > distance) {
 				bestDistance = distance;
 				bestSolution = solution.clone();
@@ -84,12 +83,10 @@ public abstract class ProblemSolver {
 	public void nearestNeighbour() {
 		int[] bestSolution;
 		nearestSingleNeighbour(1);
-		System.out.println(this);
 		int bestDistance = distance;
 		bestSolution = solution.clone();
 		for (int i = 2; i <= dimension; i++) {
 			nearestSingleNeighbour(i);
-			System.out.println(this);
 			if(bestDistance > distance) {
 				bestDistance = distance;
 				bestSolution = solution.clone();
@@ -102,7 +99,10 @@ public abstract class ProblemSolver {
 	protected abstract boolean cutEdges(int[] edgesToCut);
 
 	public void twoOpt() {
-		randomPermutation();
+		//randomPermutation();
+		for (int i = 0; i < dimension; i++) {
+			solution[i] = i + 1;
+		}
 		int[] edgesToCut = new int[2];
 		boolean changes;
 		do {

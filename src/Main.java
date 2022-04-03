@@ -28,7 +28,7 @@ public class Main {
 //            ex.printStackTrace();
 //        }
         main.structure = new Matrix();
-        main.structure.randomAsymmetricGenerateMatrix(8, 10000);
+        main.structure.randomSymmetricGenerateMatrix(30, 10);
         for (int i = 0; i < main.structure.getDimension(); i++) {
             for (int j = 0; j < main.structure.getDimension(); j++) {
                 System.out.print(main.structure.get(i, j) + " ");
@@ -41,8 +41,7 @@ public class Main {
                 System.out.println(i+" "+((Euklides)main.structure).getX(i)+" "+((Euklides)main.structure).getY(i));
         main.problemSolver = main.structure.isSymmetric() ? new SymmetricProblemSolver(main.structure)
                 : new AsymmetricProblemSolver(main.structure);
-        main.problemSolver.kRandom(100);
+        main.problemSolver.kOpt(5);
         System.out.println(main.problemSolver.toString());
-        main.problemSolver.kOpt(3);
     }
 }

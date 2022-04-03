@@ -7,14 +7,28 @@ public abstract class ProblemSolver {
 	protected final int dimension;
 	protected int[] solution;
 	protected final Matrix matrix;
+
 	protected int distance;
-	protected int[] tmpPermutation;
-	protected int[] permutation;
-	protected int[] finalPermutation;
 	protected int helpDistance;
 	protected int firstDistance;
-	protected int[] nextCity;
-	
+	protected int revFirstDistance;
+	protected int[][] distances;
+
+	protected int[] permutation;
+	protected int[] finalPermutation;
+	protected int[] helpPermutation;
+
+	/**
+	 * Tablica używana do przechowania chwilowego stanu kolejności,
+	 * w jakich odwiedzane są miasta, które łączy nieprzerwana droga.
+	 */
+	protected boolean[] booleanArray;
+	protected boolean[] helpBooleanArray;
+	protected boolean[] finalBooleanArray;
+
+	protected int[] corrCity;
+	protected int[] finalCorrCity;
+
 	public ProblemSolver(Matrix matrix) {
 		this.matrix=matrix;
 		this.dimension = matrix.getDimension();
@@ -23,7 +37,8 @@ public abstract class ProblemSolver {
 
 	public void randomPermutation() {
 		Random random = new Random();
-
+		for(int i = 0; i < dimension; i++)
+			solution[i] = i + 1;
 		for (int i = dimension - 1; i > 0; i--) {
 			int j = random.nextInt(i + 1);
 			int temp = solution[i];
@@ -34,18 +49,19 @@ public abstract class ProblemSolver {
 	}
 
 	public void kRandom(int k) {
-		for(int i = 0; i < dimension; i++)
-			solution[i] = i + 1;
+		long end = System.currentTimeMillis() + 10000;
 		randomPermutation();
 		int[] bestSolution;
 		int bestDistance = distance;
 		bestSolution = solution.clone();
 
-		for (int i = 1; i < k; i++) {
+		for (int i = 1; i < k  && System.currentTimeMillis() < end; i++) {
 			randomPermutation();
 			if(bestDistance > distance) {
 				bestDistance = distance;
 				bestSolution = solution.clone();
+			} else {
+				distance = bestDistance;
 			}
 		}
 		solution = bestSolution.clone();
@@ -100,10 +116,9 @@ public abstract class ProblemSolver {
 	protected abstract boolean cutEdges(int[] edgesToCut);
 
 	public void twoOpt() {
-		//randomPermutation();
-		for (int i = 0; i < dimension; i++) {
-			solution[i] = i + 1;
-		}
+		long start = System.currentTimeMillis(), end = start + 10000;
+		randomPermutation();
+		//nearestNeighbour();
 		int[] edgesToCut = new int[2];
 		boolean changes;
 
@@ -117,120 +132,143 @@ public abstract class ProblemSolver {
 					solution[index] = tmp;
 				}
 			}
-		} while (changes);
+		} while (changes && System.currentTimeMillis() < end);
+		//System.out.println(System.currentTimeMillis() - start);
 	}
-
-	/*public void threeOpt() {
-		randomPermutation();
-		int tmpDistance, firstDistance;
-		int[] edgesToCut = new int[3];
-		boolean[] firstOrSecond = new boolean[2];
-		boolean changes;
-		do {
-			changes = cutEdges(edgesToCut);
-			firstDistance = distance;
-			for (int i = 0; i < dimension; i++) {
-				for (int j = i + 2; j < dimension + i - 4; j++) {
-					for (int k = j + 2; k < dimension + j - 2; k++) {
-						int helpDistance = firstDistance - matrix.get(solution[i], solution[(i + 1) % dimension])
-								- matrix.get(solution[j], solution[(j + 1) % dimension])
-								- matrix.get(solution[k], solution[(k + 1) % dimension]);
-						for (int l = 1; l < 8; l++) {
-							int a = (l % 2 == 0 ? j : k);
-							int b = ()
-							tmpDistance = helpDistance + matrix.get(solution[i], solution[])
-									+ matrix.get(solution[], solution[])
-									+ matrix.get(solution[], solution[])
-						}
-					}
-				}
-			}
-			if (changes) {
-				for (int i = edgesToCut[0] + 1; i < (edgesToCut[1] + edgesToCut[0] + 3) / 2; i++) {
-					int tmp = solution[i % dimension];
-					int index = (edgesToCut[1] - i + edgesToCut[0] + 1) % dimension;
-					solution[i % dimension] = solution[index];
-					solution[index] = tmp;
-				}
-			}
-		} while (changes);
-	}*/
 
 	public void kOpt(int k) {
 		randomPermutation();
 		firstDistance = distance;
-		finalPermutation = null;
-		nextCity = new int[dimension];
+		corrCity = new int[dimension];
 		permutation = new int[k];
-		permutation[0] = 1;
-		recKOpt(k, 0);
-		if (finalPermutation != null) {
-			//zmiany w solution
+		booleanArray = new boolean[k];
+		if (this instanceof SymmetricProblemSolver) {
+			booleanArray[0] = false;
+		} else {
+			distances = new int[2][dimension];
+			distances[0][0] = 0;
+			distances[0][dimension - 1] = 0;
+			for (int i = 1; i < dimension; i++) {
+				distances[0][i] = distances[0][i - 1] + matrix.get(solution[i - 1] - 1, solution[i] - 1);
+				distances[1][dimension - 1 - i] = distances[1][dimension - i]
+						+ matrix.get(solution[dimension - 1 - i] - 1, solution[dimension - i] - 1);
+			}
+			revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] -1);
 		}
+		do {
+			System.out.println(this);
+			finalPermutation = null;
+			initPermutation(k, 0);
+			if (finalPermutation != null) {
+				int[] tmpSolution = new int[dimension];
+				int j = 0;
+				for (int i = 0; i < k; i++) {
+					int a = finalPermutation[i];
+					int b = finalCorrCity[finalPermutation[i]];
+					a += (a < b ? dimension : 0);
+					if (finalBooleanArray[i]) {
+						for (int l = a; l >= b; l--) {
+							tmpSolution[j++] = solution[l % dimension];
+						}
+					} else {
+						for (int l = b; l <= a; l++) {
+							tmpSolution[j++] = solution[l % dimension];
+						}
+					}
+				}
+				solution = tmpSolution.clone();
+			}
+		} while (finalPermutation != null);
 	}
 
-	private void recKOpt(int k, int l) {
+	private void initPermutation(int k, int l) {
 		if (l == k) {
-			helpDistance = firstDistance;
-			tmpPermutation = permutation.clone();
-			permutations(k, true);
+			int tmpDistance = distance;
+			initBooleanArray(k, (this instanceof SymmetricProblemSolver ? 1 : 0), firstDistance);
+			if (tmpDistance > distance) {
+				finalCorrCity = corrCity.clone();
+			}
 			return;
 		}
-		for (int i = (l == 0 ? 0 : permutation[l - 1] + 2); i < dimension - (permutation[0] == 0 ? 1 : 0) - 2 * (k - l - 1); i++) {
+		for (int i = (l == 0 ? 0 : permutation[l - 1] + 2); i < dimension - (l > 0 && permutation[0] == 0 ? 1 : 0) - 2 * (k - l - 1); i++) {
+			permutation[l] = i;
 			if (l > 0) {
-				nextCity[permutation[l - 1]] = permutation[l];
+				corrCity[permutation[l]] = (permutation[l - 1] + 1) % dimension;
 				if (l == k - 1) {
-					nextCity[permutation[0]] = permutation[k - 1];
+					corrCity[permutation[0]] = (permutation[k - 1] + 1) % dimension;
 				}
 			}
-			permutation[l] = i;
-			recKOpt(k, l + 1);
+			initPermutation(k, l + 1);
 		}
 	}
 
-	public int permutations(int l, boolean isEven) {
-		if (l == dimension) {
+	private void initBooleanArray(int k, int l, int distance) {
+		if (l == k) {
+			if (distance < this.distance) {
+				this.distance = distance;
+				finalPermutation = permutation.clone();
+				finalBooleanArray = booleanArray.clone();
+			}
+			helpDistance = distance;
+			helpPermutation = permutation.clone();
+			helpBooleanArray = booleanArray.clone();
+			permutations(2, true, k);
+			return;
+		}
+		booleanArray[l] = false;
+		initBooleanArray(k, l + 1, distance);
+		int m1 = solution[l > 0 ? (booleanArray[l - 1] ? corrCity[permutation[l - 1]]: permutation[l - 1]) : permutation[k - 1]];
+		int m2 = solution[corrCity[permutation[l]]];
+		int m3 = solution[permutation[l]];
+		int m4 = solution[(permutation[l] + 1) % dimension];
+		distance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
+		distance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
+		if (this instanceof AsymmetricProblemSolver) {
+			distance += distances[1][corrCity[permutation[l]]] - distances[1][permutation[l]]
+					- distances[0][permutation[l]] + distances[0][corrCity[permutation[l]]];
+			if (permutation[l] < corrCity[permutation[l]]) {
+				distance += revFirstDistance - firstDistance;
+			}
+		}
+		booleanArray[l] = true;
+		initBooleanArray(k, l + 1, distance);
+	}
+
+	public int permutations(int l, boolean isEven, int k) {
+		if (l == k) {
 			return 0;
 		}
-		int j = 0;
-		if (isEven) {
-			for (int i = l; i > 0; i--) {
-				j = permutations(l + 1, isEven);
-				isEven = !isEven;
-				int tmp = tmpPermutation[i + j];
-				tmpPermutation[i + j] = tmpPermutation[i + j - 1];
-				tmpPermutation[i + j - 1] = tmp;
-				// coś z dodawaniem i usuwaniem krawędzi (helpDistance)
-				if (helpDistance < distance) {
-					distance = helpDistance;
-					finalPermutation = tmpPermutation.clone();
-				}
-			}
-			j = permutations(l + 1, isEven);
-			return j + 1;
-		} else {
-			if (l % 2 == 1) {
-				isEven = true;
-			}
-			for (int i = 0; i < l; i++) {
-				j = permutations(l + 1, isEven);
-				isEven = !isEven;
-				System.out.println(this);
-				int tmp = tmpPermutation[i + j];
-				tmpPermutation[i + j] = tmpPermutation[i + j + 1];
-				tmpPermutation[i + j + 1] = tmp;
-				int tmpDistance = helpDistance;
-				// coś z dodawaniem i usuwaniem krawędzi (helpDistance)
-				helpDistance = 1;
-				if (helpDistance < distance) {
-					distance = helpDistance;
-					finalPermutation = tmpPermutation.clone();
-				}
-			}
-			j = permutations(l + 1, isEven);
-			return j;
-		}
+		int j, it = (isEven ? -1 : 1);
+		int start = (isEven ? l - 1 : 1);
+		for (int i = start; i * it <= (l - start) * it; i += it) {
+			j = permutations(l + 1, isEven, k);
+			isEven = !isEven;
 
+			int m1 = solution[helpBooleanArray[i + j - 1] ? corrCity[helpPermutation[i + j - 1]] : helpPermutation[i + j - 1]];
+			int m2 = solution[helpBooleanArray[i + j] ? helpPermutation[i + j] : corrCity[helpPermutation[i + j]]];
+			int m3 = solution[helpBooleanArray[i + j + 1] ? corrCity[helpPermutation[i + j + 1]] : helpPermutation[i + j + 1]];
+			int m4 = solution[helpBooleanArray[(i + j + 2) % k] ? helpPermutation[(i + j + 2) % k] : corrCity[helpPermutation[(i + j + 2) % k]]];
+			helpDistance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
+			helpDistance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
+			if (this instanceof AsymmetricProblemSolver) {
+				// dodaj krawędzie w jedną stronę i odejmij w drugą
+			}
+
+			int tmp = helpPermutation[i + j];
+			helpPermutation[i + j] = helpPermutation[i + j + 1];
+			helpPermutation[i + j + 1] = tmp;
+			boolean tmpBool = !helpBooleanArray[i + j];
+			helpBooleanArray[i + j] = !helpBooleanArray[i + j + 1];
+			helpBooleanArray[i + j + 1] = tmpBool;
+
+			if (helpDistance < distance) {
+				distance = helpDistance;
+				finalPermutation = helpPermutation.clone();
+				finalBooleanArray = helpBooleanArray.clone();
+			}
+		}
+		j = permutations(l + 1, isEven, k);
+		return j + (isEven ? 1 : 0);
 	}
 
 	public double getDistance() {

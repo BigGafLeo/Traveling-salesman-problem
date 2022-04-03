@@ -23,38 +23,42 @@ public class Tests {
         assert atsp_files != null;
         double[][] atsp_distance = new double[3][atsp_files.length];
         Matrix matrix;
+        AsymmetricProblemSolver asymmetricProblemSolver;
+        SymmetricProblemSolver symmetricProblemSolver;
 
+        System.out.println("\nAsymmetric problem:");
         for(int i = 0 ; i < atsp_files.length; i++)
         {
             try {
                 matrix = FileManager.readFile("data/ALL_atsp/" + atsp_files[i]);
-                AsymmetricProblemSolver asymmetricProblemSolver = new AsymmetricProblemSolver(matrix);
+                asymmetricProblemSolver = new AsymmetricProblemSolver(matrix);
                 asymmetricProblemSolver.kRandom(1000);
                 atsp_distance[0][i] = asymmetricProblemSolver.getDistance();
                 asymmetricProblemSolver.nearestNeighbour();
                 atsp_distance[1][i] = asymmetricProblemSolver.getDistance();
                 asymmetricProblemSolver.twoOpt();
                 atsp_distance[2][i] = asymmetricProblemSolver.getDistance();
+                System.out.println(atsp_distance[0][i] + " " + atsp_distance[1][i] + " " + atsp_distance[2][i]);
             } catch (FileNotFoundException | WrongFileFormatException e) {
                 e.printStackTrace();
             }
-            System.out.println("Przynajmniej cos sie dzieje");
         }
+        System.out.println("\nSymmetric problem:");
         for(int i = 0 ; i < tsp_files.length && i<6; i++)
         {
             try {
                 matrix = FileManager.readFile("data/ALL_tsp/" + tsp_files[i]);
-                SymmetricProblemSolver symmetricProblemSolver = new SymmetricProblemSolver(matrix);
+                symmetricProblemSolver = new SymmetricProblemSolver(matrix);
                 symmetricProblemSolver.kRandom(1000);
                 tsp_distance[0][i] = symmetricProblemSolver.getDistance();
                 symmetricProblemSolver.nearestNeighbour();
                 tsp_distance[1][i] = symmetricProblemSolver.getDistance();
                 symmetricProblemSolver.twoOpt();
                 tsp_distance[2][i] = symmetricProblemSolver.getDistance();
+                System.out.println(tsp_distance[0][i] + " " + tsp_distance[1][i] + " " + tsp_distance[2][i]);
             } catch (FileNotFoundException | WrongFileFormatException e) {
                 e.printStackTrace();
             }
-            System.out.println("Przynajmniej cos sie dzieje " + tsp_files[i]);
         }
         WilcoxonSignedRankTest wilcoxonSignedRankTest = new WilcoxonSignedRankTest();
         //[0] - 2-opt & random
@@ -70,6 +74,18 @@ public class Tests {
         atsp_results[1] = wilcoxonSignedRankTest.wilcoxonSignedRank(atsp_distance[2], atsp_distance[1]);
         atsp_results[2] = wilcoxonSignedRankTest.wilcoxonSignedRank(atsp_distance[0], atsp_distance[1]);
 
-        System.out.println(Arrays.toString(atsp_results) + "\n" + Arrays.toString(tsp_results));
+        System.out.println("\nWilcoxon test results:\n" + Arrays.toString(atsp_results) + "\n" + Arrays.toString(tsp_results));
+
+        try {
+            matrix = FileManager.readFile("data/ALL_tsp/ch150.tsp");
+            symmetricProblemSolver = new SymmetricProblemSolver(matrix);
+            symmetricProblemSolver.kRandom(10000);
+            System.out.println(symmetricProblemSolver.getDistance());
+            symmetricProblemSolver.twoOpt();
+            System.out.println(symmetricProblemSolver.getDistance());
+        } catch (FileNotFoundException | WrongFileFormatException e) {
+            e.printStackTrace();
+        }
+
     }
 }

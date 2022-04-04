@@ -19,15 +19,15 @@ public class Tests {
         //[1] - nearest
         //[2] - 2-opt
         assert tsp_files != null;
-        double[][] tsp_distance = new double[3][tsp_files.length];
+        double[][] tsp_distance = new double[3][6];
         assert atsp_files != null;
-        double[][] atsp_distance = new double[3][atsp_files.length];
+        double[][] atsp_distance = new double[3][19];
         Matrix matrix;
         AsymmetricProblemSolver asymmetricProblemSolver;
         SymmetricProblemSolver symmetricProblemSolver;
 
         System.out.println("\nAsymmetric problem:");
-        for(int i = 0 ; i < atsp_files.length; i++)
+        for(int i = 0 ; i < atsp_distance[1].length; i++)
         {
             try {
                 matrix = FileManager.readFile("data/ALL_atsp/" + atsp_files[i]);
@@ -44,7 +44,7 @@ public class Tests {
             }
         }
         System.out.println("\nSymmetric problem:");
-        for(int i = 0 ; i < tsp_files.length && i<6; i++)
+        for(int i = 0 ; i < tsp_distance.length; i++)
         {
             try {
                 matrix = FileManager.readFile("data/ALL_tsp/" + tsp_files[i]);
@@ -65,14 +65,14 @@ public class Tests {
         //[1] - 2-opt & nearest
         //[2] - nearest & random
         double[] tsp_results = new double[3];
-        tsp_results[0] = wilcoxonSignedRankTest.wilcoxonSignedRank(tsp_distance[2], tsp_distance[0]);
-        tsp_results[1] = wilcoxonSignedRankTest.wilcoxonSignedRank(tsp_distance[2], tsp_distance[1]);
-        tsp_results[2] = wilcoxonSignedRankTest.wilcoxonSignedRank(tsp_distance[0], tsp_distance[1]);
+        tsp_results[0] = wilcoxonSignedRankTest.wilcoxonSignedRankTest(tsp_distance[2], tsp_distance[0], true);
+        tsp_results[1] = wilcoxonSignedRankTest.wilcoxonSignedRankTest(tsp_distance[2], tsp_distance[1], true);
+        tsp_results[2] = wilcoxonSignedRankTest.wilcoxonSignedRankTest(tsp_distance[0], tsp_distance[1], true);
 
         double[] atsp_results = new double[3];
-        atsp_results[0] = wilcoxonSignedRankTest.wilcoxonSignedRank(atsp_distance[2], atsp_distance[0]);
-        atsp_results[1] = wilcoxonSignedRankTest.wilcoxonSignedRank(atsp_distance[2], atsp_distance[1]);
-        atsp_results[2] = wilcoxonSignedRankTest.wilcoxonSignedRank(atsp_distance[0], atsp_distance[1]);
+        atsp_results[0] = wilcoxonSignedRankTest.wilcoxonSignedRankTest(atsp_distance[2], atsp_distance[0], true);
+        atsp_results[1] = wilcoxonSignedRankTest.wilcoxonSignedRankTest(atsp_distance[2], atsp_distance[1], true);
+        atsp_results[2] = wilcoxonSignedRankTest.wilcoxonSignedRankTest(atsp_distance[0], atsp_distance[1], true);
 
         System.out.println("\nWilcoxon test results:\n" + Arrays.toString(atsp_results) + "\n" + Arrays.toString(tsp_results));
 
@@ -86,6 +86,7 @@ public class Tests {
         } catch (FileNotFoundException | WrongFileFormatException e) {
             e.printStackTrace();
         }
-
+*/
+        TestKOpt_UponK("data/ALL_tsp/a280.tsp", 2755);
     }
 }

@@ -160,12 +160,13 @@ public abstract class ProblemSolver {
 
 	public void twoOpt() {
 		long start = System.currentTimeMillis(), end = start + 10000;
-		randomPermutation();
+		//randomPermutation();
 		//nearestNeighbour();
 		int[] edgesToCut = new int[2];
 		boolean changes;
 
 		do {
+			System.out.println(this);
 			changes = cutEdges(edgesToCut);
 			if (changes) {
 				for (int i = edgesToCut[0] + 1; i < (edgesToCut[1] + edgesToCut[0] + 3) / 2; i++) {
@@ -180,26 +181,27 @@ public abstract class ProblemSolver {
 	}
 
 	public void kOpt(int k) {
-		randomPermutation();
-		firstDistance = distance;
+		//randomPermutation();
+		System.out.println();
 		corrCity = new int[dimension];
 		finalCorrCity = new int[dimension];
 		permutation = new int[k];
 		booleanArray = new boolean[k];
-		if (this instanceof SymmetricProblemSolver) {
-			booleanArray[0] = false;
-		} else {
-			distances = new int[2][dimension];
-			distances[0][0] = 0;
-			distances[0][dimension - 1] = 0;
-			for (int i = 1; i < dimension; i++) {
-				distances[0][i] = distances[0][i - 1] + matrix.get(solution[i - 1] - 1, solution[i] - 1);
-				distances[1][dimension - 1 - i] = distances[1][dimension - i]
-						+ matrix.get(solution[dimension - i] - 1, solution[dimension - 1 - i] - 1);
-			}
-			revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] - 1);
-		}
 		do {
+			firstDistance = distance;
+			if (this instanceof SymmetricProblemSolver) {
+				booleanArray[0] = false;
+			} else {
+				distances = new int[2][dimension];
+				distances[0][0] = 0;
+				distances[0][dimension - 1] = 0;
+				for (int i = 1; i < dimension; i++) {
+					distances[0][i] = distances[0][i - 1] + matrix.get(solution[i - 1] - 1, solution[i] - 1);
+					distances[1][dimension - 1 - i] = distances[1][dimension - i]
+							+ matrix.get(solution[dimension - i] - 1, solution[dimension - 1 - i] - 1);
+				}
+				revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] - 1);
+			}
 			System.out.println(this);
 			finalPermutation = null;
 			initPermutation(k, 0);
@@ -353,5 +355,14 @@ public abstract class ProblemSolver {
 
 	public double getDistance() {
 		return distance;
+	}
+
+	public int[] getSolution() {
+		return solution;
+	}
+
+	public void setSolution(int[] solution) {
+		this.solution = solution;
+		distance = matrix.distance(solution);
 	}
 }

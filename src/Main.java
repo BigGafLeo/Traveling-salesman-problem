@@ -1,7 +1,5 @@
 import Structure.*;
 
-import java.util.Objects;
-
 public class Main {
 
     private Matrix structure;
@@ -28,7 +26,7 @@ public class Main {
 //            ex.printStackTrace();
 //        }
         main.structure = new Matrix();
-        main.structure.randomSymmetricGenerateMatrix(30, 10);
+        main.structure.randomAsymmetricGenerateMatrix(10, 10);
         for (int i = 0; i < main.structure.getDimension(); i++) {
             for (int j = 0; j < main.structure.getDimension(); j++) {
                 System.out.print(main.structure.get(i, j) + " ");

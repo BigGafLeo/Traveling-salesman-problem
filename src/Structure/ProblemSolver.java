@@ -8,25 +8,68 @@ public abstract class ProblemSolver {
 	protected int[] solution;
 	protected final Matrix matrix;
 
+	/**
+	 * Długość możliwie najktótszej drogi.
+	 */
 	protected int distance;
+	/**
+	 * Długość drogi używana w funkcji permutations.
+	 */
 	protected int helpDistance;
+	/**
+	 * Długość początkowo wygenerowanej drogi.
+	 */
 	protected int firstDistance;
+	/**
+	 * Długość odwróceonej początkowo wygenerowanej drogi.
+	 */
 	protected int revFirstDistance;
+	/**
+	 * distances[0] - tablica długości początkowej drogi prowadzącej od pierwszego miasta
+	 * distances[1] - tablica długości odwróconej początkowej drogi prowadzącej od ostatniego miasta
+	 */
 	protected int[][] distances;
 
+	/**
+	 * Permutacja miast używana w funkcji initPermutation.
+	 */
 	protected int[] permutation;
+	/**
+	 * Ostateczna permutacja miast.
+	 */
 	protected int[] finalPermutation;
+	/**
+	 * Permutacja miast używana w funkcji permutations.
+	 */
 	protected int[] helpPermutation;
 
 	/**
 	 * Tablica używana do przechowania chwilowego stanu kolejności,
-	 * w jakich odwiedzane są miasta, które łączy nieprzerwana droga.
+	 * w jakich odwiedzane są miasta, które łączy nieprzerwana droga,
+	 * używana w funkcji initBooleanArray.
 	 */
 	protected boolean[] booleanArray;
+	/**
+	 * Tablica używana do przechowania chwilowego stanu kolejności,
+	 * w jakich odwiedzane są miasta, które łączy nieprzerwana droga,
+	 * używana w funkcji permutations.
+	 */
 	protected boolean[] helpBooleanArray;
+	/**
+	 * Tablica używana do przechowania ostatecznego stanu kolejności,
+	 * w jakich odwiedzane są miasta, które łączy nieprzerwana droga.
+	 */
 	protected boolean[] finalBooleanArray;
 
+	/**
+	 * Tablica przyporządkowująca jednemu z krańcowych miast drogi
+	 * drugie krańcowe miasto tej drogi.
+	 */
 	protected int[] corrCity;
+	/**
+	 * Ostateczna tablica przyporządkowująca jednemu z krańcowych miast drogi
+	 * drugie krańcowe miasto tej drogi.
+	 */
 	protected int[] finalCorrCity;
 
 	public ProblemSolver(Matrix matrix) {
@@ -140,6 +183,7 @@ public abstract class ProblemSolver {
 		randomPermutation();
 		firstDistance = distance;
 		corrCity = new int[dimension];
+		finalCorrCity = new int[dimension];
 		permutation = new int[k];
 		booleanArray = new boolean[k];
 		if (this instanceof SymmetricProblemSolver) {
@@ -151,9 +195,9 @@ public abstract class ProblemSolver {
 			for (int i = 1; i < dimension; i++) {
 				distances[0][i] = distances[0][i - 1] + matrix.get(solution[i - 1] - 1, solution[i] - 1);
 				distances[1][dimension - 1 - i] = distances[1][dimension - i]
-						+ matrix.get(solution[dimension - 1 - i] - 1, solution[dimension - i] - 1);
+						+ matrix.get(solution[dimension - i] - 1, solution[dimension - 1 - i] - 1);
 			}
-			revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] -1);
+			revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] - 1);
 		}
 		do {
 			System.out.println(this);
@@ -186,7 +230,9 @@ public abstract class ProblemSolver {
 			int tmpDistance = distance;
 			initBooleanArray(k, (this instanceof SymmetricProblemSolver ? 1 : 0), firstDistance);
 			if (tmpDistance > distance) {
-				finalCorrCity = corrCity.clone();
+				for (int i = 0; i < k; i++) {
+					finalCorrCity[permutation[i]] = corrCity[permutation[i]];
+				}
 			}
 			return;
 		}
@@ -251,7 +297,41 @@ public abstract class ProblemSolver {
 			helpDistance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
 			helpDistance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
 			if (this instanceof AsymmetricProblemSolver) {
-				// dodaj krawędzie w jedną stronę i odejmij w drugą
+				int a, b, c, d;
+				if (helpBooleanArray[i + j]) {
+					c = helpPermutation[i + j];
+					a = corrCity[c];
+					d = 1;
+					if (c < a) {
+						helpDistance += firstDistance - revFirstDistance;
+					}
+				} else {
+					a = helpPermutation[i + j];
+					c = corrCity[a];
+					d = 0;
+					if (a < c) {
+						helpDistance += revFirstDistance - firstDistance;
+					}
+				}
+				helpDistance += distances[1 - d][c] - distances[1 - d][a] - distances[d][a] + distances[d][c];
+				if (helpBooleanArray[i + j + 1]) {
+					b = helpPermutation[i + j + 1];
+					c = corrCity[b];
+					d = 1;
+					if (b < c) {
+						helpDistance += firstDistance - revFirstDistance;
+					}
+				} else {
+					c = helpPermutation[i + j + 1];
+					b = corrCity[c];
+					d = 0;
+					if (c < b) {
+						helpDistance += revFirstDistance - firstDistance;
+					}
+				}
+				helpDistance += distances[1 - d][b] - distances[1 - d][c] - distances[d][c] + distances[d][b];
+				helpDistance += matrix.get(solution[b] - 1, solution[a] - 1)
+						- matrix.get(solution[a] - 1, solution[b] - 1);
 			}
 
 			int tmp = helpPermutation[i + j];

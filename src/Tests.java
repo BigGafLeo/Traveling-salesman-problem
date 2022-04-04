@@ -1,14 +1,58 @@
 import Structure.AsymmetricProblemSolver;
 import Structure.Matrix;
+import Structure.ProblemSolver;
 import Structure.SymmetricProblemSolver;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 public class Tests {
 
+    static public void TestKRandom_UponK(String dir, int optimal)
+    {
+        Matrix matrix;
+        SymmetricProblemSolver problemSolver;
+        try {
+            matrix = FileManager.readFile(dir);
+            PrintWriter writer = new PrintWriter(dir+"TestKRandom_UponK_.csv");
+            problemSolver = new SymmetricProblemSolver(matrix);
+            for(int k = 1; k <= 1000; k+=10) {
+                problemSolver.kRandom(k);
+                writer.println(k + ";" + problemSolver.getDistance() / optimal);
+            }
+            writer.close();
+        } catch (FileNotFoundException | WrongFileFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static public void TestKOpt_UponK(String dir, int optimal)
+    {
+        Matrix matrix;
+        AsymmetricProblemSolver problemSolver;
+        try {
+            matrix = FileManager.readFile(dir);
+            PrintWriter writer = new PrintWriter(dir+"TestKOpt_UponK_.csv");
+            problemSolver = new AsymmetricProblemSolver(matrix);
+            problemSolver.randomPermutation();
+            int[] initialSolution = problemSolver.getSolution();
+            for(int k = 2; k <= 2; k++) {
+                problemSolver.kOpt(k);
+                writer.println(k + ";" + problemSolver.getDistance() / optimal);
+                problemSolver.setSolution(initialSolution);
+            }
+            problemSolver.twoOpt();
+            System.out.println(problemSolver);
+            writer.close();
+        } catch (FileNotFoundException | WrongFileFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
+        /*
         File dir_atsp = new File("data/ALL_atsp");
         String[] atsp_files = dir_atsp.list();
         File dir_tsp = new File("data/ALL_tsp");

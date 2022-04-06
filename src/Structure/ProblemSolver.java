@@ -206,10 +206,8 @@ public abstract class ProblemSolver {
 		int min = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[k] - 1);
 		for (int i = k + 1; i < dimension; i++) {
 			int a = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[i] - 1);
-			if (a <= min) {
-				if (a < min) {
-					min = a;
-				}
+			if (a < min) {
+				min = a;
 			}
 		}
 		distance += min;
@@ -219,8 +217,8 @@ public abstract class ProblemSolver {
 				tmpSolution[k] = tmpSolution[i];
 				tmpSolution[i] = tmp;
 				nearestNeighboursRec(k + 1, distance);
-				tmpSolution[i] = tmpSolution[k];
-				tmpSolution[k] = tmp;
+				//tmpSolution[i] = tmpSolution[k];
+				//tmpSolution[k] = tmp;
 			}
 		}
 	}

@@ -41,10 +41,9 @@ public class Tests {
             for(int k = 4; k <= 4; k++) {
                 problemSolver.kOpt(k);
                 writer.println(k + ";" + problemSolver.getDistance() / optimal);
+                System.out.println(problemSolver.getDistance());
                 problemSolver.setSolution(initialSolution);
             }
-            problemSolver.twoOpt();
-            System.out.println(problemSolver);
             writer.close();
         } catch (FileNotFoundException | WrongFileFormatException e) {
             e.printStackTrace();
@@ -131,6 +130,8 @@ public class Tests {
             e.printStackTrace();
         }
 */
-        TestKOpt_UponK("data/ALL_tsp/a280.tsp", 2755);
+        TestKOpt_UponK("data/ALL_tsp/bays29.tsp", 6905);
+
+
     }
 }

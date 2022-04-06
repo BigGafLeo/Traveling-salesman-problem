@@ -265,7 +265,8 @@ public abstract class ProblemSolver {
 
 	public void kOpt(int k) {
 		//randomPermutation();
-		System.out.println();
+		long start = System.currentTimeMillis();
+		//System.out.println();
 		corrCity = new int[dimension];
 		finalCorrCity = new int[dimension];
 		permutation = new int[k];
@@ -285,7 +286,7 @@ public abstract class ProblemSolver {
 				}
 				revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] - 1);
 			}
-			System.out.println(this);
+			System.out.println("\n\n" + this + "\n\n");
 			finalPermutation = null;
 			initPermutation(k, 0);
 			if (finalPermutation != null) {
@@ -308,6 +309,7 @@ public abstract class ProblemSolver {
 				solution = tmpSolution.clone();
 			}
 		} while (finalPermutation != null);
+		System.out.println("\n" + (System.currentTimeMillis() - start) + "\n");
 	}
 
 	private void initPermutation(int k, int l) {
@@ -381,6 +383,8 @@ public abstract class ProblemSolver {
 			int m4 = solution[helpBooleanArray[(i + j + 2) % k] ? helpPermutation[(i + j + 2) % k] : corrCity[helpPermutation[(i + j + 2) % k]]];
 			helpDistance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
 			helpDistance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
+			System.out.println(i + " " + j);
+			System.out.println(Arrays.toString(helpPermutation));
 			if (this instanceof AsymmetricProblemSolver) {
 				int a, b, c, d;
 				if (helpBooleanArray[i + j]) {
@@ -398,7 +402,7 @@ public abstract class ProblemSolver {
 						helpDistance += revFirstDistance - firstDistance;
 					}
 				}
-				helpDistance += distances[1 - d][c] - distances[1 - d][a] - distances[d][a] + distances[d][c];
+				helpDistance += distances[1 - d][a] - distances[1 - d][c] - distances[d][c] + distances[d][a];
 				if (helpBooleanArray[i + j + 1]) {
 					b = helpPermutation[i + j + 1];
 					c = corrCity[b];
@@ -414,7 +418,8 @@ public abstract class ProblemSolver {
 						helpDistance += revFirstDistance - firstDistance;
 					}
 				}
-				helpDistance += distances[1 - d][b] - distances[1 - d][c] - distances[d][c] + distances[d][b];
+				System.out.println(a + " " + b);
+				helpDistance += distances[1 - d][c] - distances[1 - d][b] - distances[d][b] + distances[d][c];
 				helpDistance += matrix.get(solution[b] - 1, solution[a] - 1)
 						- matrix.get(solution[a] - 1, solution[b] - 1);
 			}

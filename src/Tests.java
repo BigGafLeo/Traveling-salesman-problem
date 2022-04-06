@@ -31,14 +31,14 @@ public class Tests {
     static public void TestKOpt_UponK(String dir, int optimal)
     {
         Matrix matrix;
-        SymmetricProblemSolver problemSolver;
+        AsymmetricProblemSolver problemSolver;
         try {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKOpt_UponK_.csv");
-            problemSolver = new SymmetricProblemSolver(matrix);
+            problemSolver = new AsymmetricProblemSolver(matrix);
             problemSolver.randomPermutation();
             int[] initialSolution = problemSolver.getSolution();
-            for(int k = 4; k <= 4; k++) {
+            for(int k = 3; k <= 3; k++) {
                 problemSolver.kOpt(k);
                 writer.println(k + ";" + problemSolver.getDistance() / optimal);
                 System.out.println(problemSolver.getDistance());

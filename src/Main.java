@@ -39,7 +39,8 @@ public class Main {
                 System.out.println(i+" "+((Euklides)main.structure).getX(i)+" "+((Euklides)main.structure).getY(i));
         main.problemSolver = main.structure.isSymmetric() ? new SymmetricProblemSolver(main.structure)
                 : new AsymmetricProblemSolver(main.structure);
-        main.problemSolver.kOpt(5);
+        //main.problemSolver.kOpt(5);
+        main.problemSolver.nearestNeighbours();
         System.out.println(main.problemSolver.toString());
     }
 }

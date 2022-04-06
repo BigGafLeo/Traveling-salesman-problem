@@ -6,8 +6,10 @@ import java.util.Arrays;
 public abstract class ProblemSolver {
 	protected final int dimension;
 	protected int[] solution;
+	protected int[] tmpSolution;
 	protected final Matrix matrix;
 
+	protected boolean isInitiated;
 	/**
 	 * Długość możliwie najktótszej drogi.
 	 */
@@ -154,6 +156,89 @@ public abstract class ProblemSolver {
 		}
 		solution = bestSolution.clone();
 		distance = bestDistance;
+	}
+
+	/*public void nearestNeighboursRec(int k, int distance) {
+		if (k == dimension) {
+			distance += matrix.get(tmpSolution[dimension - 1] - 1, tmpSolution[0] - 1);
+			if (distance < this.distance || !isInitiated) {
+				solution = tmpSolution.clone();
+				this.distance = distance;
+				isInitiated = true;
+			}
+			return;
+		}
+		LinkedList<Integer> help = new LinkedList<>();
+		int min = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[k] - 1);
+		help.push(k);
+		for (int i = k + 1; i < dimension; i++) {
+			int a = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[i] - 1);
+			if (a <= min) {
+				if (a < min) {
+					min = a;
+					help.clear();
+				}
+				help.push(i);
+			}
+		}
+		distance += min;
+		while (!help.isEmpty()) {
+			int i = help.pop();
+			int tmp = tmpSolution[k];
+			tmpSolution[k] = tmpSolution[i];
+			tmpSolution[i] = tmp;
+			nearestNeighboursRec(k + 1, distance);
+			tmpSolution[i] = tmpSolution[k];
+			tmpSolution[k] = tmp;
+		}
+	}*/
+
+	public void nearestNeighboursRec(int k, int distance) {
+		if (k == dimension) {
+			distance += matrix.get(tmpSolution[dimension - 1] - 1, tmpSolution[0] - 1);
+			if (distance < this.distance || !isInitiated) {
+				solution = tmpSolution.clone();
+				this.distance = distance;
+				isInitiated = true;
+			}
+			return;
+		}
+		int min = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[k] - 1);
+		for (int i = k + 1; i < dimension; i++) {
+			int a = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[i] - 1);
+			if (a <= min) {
+				if (a < min) {
+					min = a;
+				}
+			}
+		}
+		distance += min;
+		for (int i = k; i < dimension; i++) {
+			if (matrix.get(tmpSolution[k - 1] - 1, tmpSolution[i] - 1) == min) {
+				int tmp = tmpSolution[k];
+				tmpSolution[k] = tmpSolution[i];
+				tmpSolution[i] = tmp;
+				nearestNeighboursRec(k + 1, distance);
+				tmpSolution[i] = tmpSolution[k];
+				tmpSolution[k] = tmp;
+			}
+		}
+	}
+
+	public void nearestNeighbours() {
+		isInitiated = false;
+		tmpSolution = new int[dimension];
+		for (int i = 1; i <= dimension; i++) {
+			tmpSolution[i - 1] = i;
+		}
+		for (int i = 0; i < dimension; i++) {
+			int tmp = tmpSolution[0];
+			tmpSolution[0] = tmpSolution[i];
+			tmpSolution[i] = tmp;
+			nearestNeighboursRec(1, 0);
+			tmpSolution[i] = tmpSolution[0];
+			tmpSolution[0] = tmp;
+		}
 	}
 
 	protected abstract boolean cutEdges(int[] edgesToCut);

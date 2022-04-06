@@ -38,10 +38,11 @@ public class Matrix {
 		for (int i = 0; i < newDimension; i++) {
 			matrix[i][i] = 0;
 			for (int j = i + 1; j < newDimension; j++) {
-				matrix[i][j] = random.nextInt(limit);
-				matrix[j][i] = random.nextInt(limit);
+				matrix[i][j] = 5;//random.nextInt(limit);
+				matrix[j][i] = 6;//random.nextInt(limit);
 			}
 		}
+		matrix[9][3] = 2;
 	}
 
 	public int distance(int[] tab) {

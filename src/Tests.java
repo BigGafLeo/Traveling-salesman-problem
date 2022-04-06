@@ -130,7 +130,7 @@ public class Tests {
             e.printStackTrace();
         }
 */
-        TestKOpt_UponK("data/ALL_tsp/bays29.tsp", 6905);
+        TestKOpt_UponK("data/ALL_atsp/ft53.atsp", 6905);
 
 
     }

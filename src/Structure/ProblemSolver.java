@@ -206,8 +206,10 @@ public abstract class ProblemSolver {
 		int min = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[k] - 1);
 		for (int i = k + 1; i < dimension; i++) {
 			int a = matrix.get(tmpSolution[k - 1] - 1, tmpSolution[i] - 1);
-			if (a < min) {
-				min = a;
+			if (a <= min) {
+				if (a < min) {
+					min = a;
+				}
 			}
 		}
 		distance += min;
@@ -217,8 +219,8 @@ public abstract class ProblemSolver {
 				tmpSolution[k] = tmpSolution[i];
 				tmpSolution[i] = tmp;
 				nearestNeighboursRec(k + 1, distance);
-				//tmpSolution[i] = tmpSolution[k];
-				//tmpSolution[k] = tmp;
+				tmpSolution[i] = tmpSolution[k];
+				tmpSolution[k] = tmp;
 			}
 		}
 	}
@@ -265,8 +267,6 @@ public abstract class ProblemSolver {
 
 	public void kOpt(int k) {
 		//randomPermutation();
-		long start = System.currentTimeMillis();
-		//System.out.println();
 		corrCity = new int[dimension];
 		finalCorrCity = new int[dimension];
 		permutation = new int[k];
@@ -278,7 +278,7 @@ public abstract class ProblemSolver {
 			} else {
 				distances = new int[2][dimension];
 				distances[0][0] = 0;
-				distances[1][dimension - 1] = 0;
+				distances[0][dimension - 1] = 0;
 				for (int i = 1; i < dimension; i++) {
 					distances[0][i] = distances[0][i - 1] + matrix.get(solution[i - 1] - 1, solution[i] - 1);
 					distances[1][dimension - 1 - i] = distances[1][dimension - i]
@@ -309,8 +309,7 @@ public abstract class ProblemSolver {
 				solution = tmpSolution.clone();
 			}
 		} while (finalPermutation != null);
-		System.out.println("\n" + (System.currentTimeMillis() - start) + "\n");
-		System.out.println(matrix.distance(solution));
+		System.out.println(this);
 	}
 
 	private void initPermutation(int k, int l) {
@@ -354,7 +353,7 @@ public abstract class ProblemSolver {
 		int m1 = solution[l > 0 ? (booleanArray[l - 1] ? corrCity[permutation[l - 1]]: permutation[l - 1]) : permutation[k - 1]];
 		int m2 = solution[corrCity[permutation[l]]];
 		int m3 = solution[permutation[l]];
-		int m4 = solution[(permutation[l] + 1) % dimension];
+		int m4 = solution[l < k - 1 ? (permutation[l] + 1) % dimension : (booleanArray[0] ? permutation[0] : corrCity[permutation[0]])];
 		distance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
 		distance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
 		if (this instanceof AsymmetricProblemSolver) {
@@ -390,32 +389,20 @@ public abstract class ProblemSolver {
 					c = helpPermutation[i + j];
 					a = corrCity[c];
 					d = 1;
-					if (c < a) {
-						helpDistance += firstDistance - revFirstDistance;
-					}
 				} else {
 					a = helpPermutation[i + j];
 					c = corrCity[a];
 					d = 0;
-					if (a < c) {
-						helpDistance += revFirstDistance - firstDistance;
-					}
 				}
 				helpDistance += distances[1 - d][c] - distances[1 - d][a] - distances[d][a] + distances[d][c];
 				if (helpBooleanArray[i + j + 1]) {
 					b = helpPermutation[i + j + 1];
 					c = corrCity[b];
 					d = 1;
-					if (b < c) {
-						helpDistance += firstDistance - revFirstDistance;
-					}
 				} else {
 					c = helpPermutation[i + j + 1];
 					b = corrCity[c];
 					d = 0;
-					if (c < b) {
-						helpDistance += revFirstDistance - firstDistance;
-					}
 				}
 				helpDistance += distances[1 - d][b] - distances[1 - d][c] - distances[d][c] + distances[d][b];
 				helpDistance += matrix.get(solution[b] - 1, solution[a] - 1)

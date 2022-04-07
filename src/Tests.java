@@ -5,8 +5,10 @@ import Structure.SymmetricProblemSolver;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import com.opencsv.CSVWriter;
 
 public class Tests {
 
@@ -17,13 +19,14 @@ public class Tests {
         try {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKRandom_UponK_.csv");
+            CSVWriter csvWriter = new CSVWriter(writer);
             problemSolver = new SymmetricProblemSolver(matrix);
             for(int k = 1; k <= 1000; k+=10) {
                 problemSolver.kRandom(k);
-                writer.println(k + ";" + problemSolver.getDistance() / optimal);
+                csvWriter.writeNext(new String[]{Integer.toString(k), Double.toString(problemSolver.getDistance() / optimal)});
             }
-            writer.close();
-        } catch (FileNotFoundException | WrongFileFormatException e) {
+            csvWriter.close();
+        } catch (WrongFileFormatException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -35,23 +38,23 @@ public class Tests {
         try {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKOpt_UponK_.csv");
+            CSVWriter csvWriter = new CSVWriter(writer);
             problemSolver = new AsymmetricProblemSolver(matrix);
             problemSolver.randomPermutation();
             int[] initialSolution = problemSolver.getSolution();
-            for(int k = 3; k <= 3; k++) {
+            for(int k = 2; k <= 4; k++) {
                 problemSolver.kOpt(k);
-                writer.println(k + ";" + problemSolver.getDistance() / optimal);
-                System.out.println(problemSolver.getDistance());
+                csvWriter.writeNext(new String[]{Integer.toString(k), Double.toString(problemSolver.getDistance() / optimal)});
+                System.out.println("\n\n\n");
                 problemSolver.setSolution(initialSolution);
             }
-            writer.close();
-        } catch (FileNotFoundException | WrongFileFormatException e) {
+            csvWriter.close();
+        } catch (WrongFileFormatException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        /*
+    public void compare() {
         File dir_atsp = new File("data/ALL_atsp");
         String[] atsp_files = dir_atsp.list();
         File dir_tsp = new File("data/ALL_tsp");
@@ -118,8 +121,10 @@ public class Tests {
         atsp_results[2] = wilcoxonSignedRankTest.wilcoxonSignedRankTest(atsp_distance[0], atsp_distance[1], true);
 
         System.out.println("\nWilcoxon test results:\n" + Arrays.toString(atsp_results) + "\n" + Arrays.toString(tsp_results));
+    }
 
-        try {
+    public static void main(String[] args) {
+        /*try {
             matrix = FileManager.readFile("data/ALL_tsp/ch150.tsp");
             symmetricProblemSolver = new SymmetricProblemSolver(matrix);
             symmetricProblemSolver.kRandom(10000);
@@ -128,10 +133,7 @@ public class Tests {
             System.out.println(symmetricProblemSolver.getDistance());
         } catch (FileNotFoundException | WrongFileFormatException e) {
             e.printStackTrace();
-        }
-*/
+        }*/
         TestKOpt_UponK("data/ALL_atsp/ft53.atsp", 6905);
-
-
     }
 }

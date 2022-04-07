@@ -42,7 +42,6 @@ public class Matrix {
 				matrix[j][i] = random.nextInt(limit);
 			}
 		}
-		matrix[9][3] = 2;
 	}
 
 	public int distance(int[] tab) {

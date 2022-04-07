@@ -1,6 +1,5 @@
 import Structure.AsymmetricProblemSolver;
 import Structure.Matrix;
-import Structure.ProblemSolver;
 import Structure.SymmetricProblemSolver;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 import java.io.File;
@@ -8,14 +7,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import com.opencsv.CSVWriter;
 
 public class Tests {
 
     static public void TestKRandom_UponK(String dir, int optimal)
     {
         Matrix matrix;
-        SymmetricProblemSolver problemSolver;
+        AsymmetricProblemSolver problemSolver;
         try {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKRandom_UponK_.csv");
@@ -37,17 +35,38 @@ public class Tests {
         try {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKOpt_UponK_.csv");
-            CSVWriter csvWriter = new CSVWriter(writer);
-            problemSolver = new AsymmetricProblemSolver(matrix);
+            problemSolver = new SymmetricProblemSolver(matrix);
             problemSolver.randomPermutation();
             int[] initialSolution = problemSolver.getSolution();
             for(int k = 2; k <= 3; k++) {
                 problemSolver.kOpt(k);
-                csvWriter.writeNext(new String[]{Integer.toString(k), Double.toString(problemSolver.getDistance() / optimal)});
-                System.out.println("\n\n\n");
+                writer.println(k + ";" + problemSolver.getDistance() / optimal);
                 problemSolver.setSolution(initialSolution);
             }
-            csvWriter.close();
+            writer.close();
+        } catch (WrongFileFormatException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static public void TestAlgorithms(String dir, int optimal)
+    {
+        Matrix matrix;
+        AsymmetricProblemSolver problemSolver;
+        try {
+            matrix = FileManager.readFile(dir);
+            PrintWriter writer = new PrintWriter(dir+"TestAlgorithms_.csv");
+            problemSolver = new AsymmetricProblemSolver(matrix);
+            /*problemSolver.kRandom(50000);
+            System.out.println("jakosc: " + problemSolver.getDistance() / optimal);
+            System.out.println("odleglosc: " + problemSolver.getDistance());
+            problemSolver.nearestNeighbour();
+            System.out.println("jakosc: " + problemSolver.getDistance() / optimal);
+            System.out.println("odleglosc: " + problemSolver.getDistance());*/
+            //problemSolver.randomPermutation();
+            problemSolver.twoOpt();
+            System.out.println("jakosc: " + problemSolver.getDistance() / optimal);
+            System.out.println("odleglosc: " + problemSolver.getDistance());
         } catch (WrongFileFormatException | IOException e) {
             e.printStackTrace();
         }
@@ -64,9 +83,9 @@ public class Tests {
         //[1] - nearest
         //[2] - 2-opt
         assert tsp_files != null;
-        double[][] tsp_distance = new double[3][6];
+        double[][] tsp_distance = new double[3][10];
         assert atsp_files != null;
-        double[][] atsp_distance = new double[3][19];
+        double[][] atsp_distance = new double[3][18];
         Matrix matrix;
         AsymmetricProblemSolver asymmetricProblemSolver;
         SymmetricProblemSolver symmetricProblemSolver;

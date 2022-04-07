@@ -94,13 +94,13 @@ public abstract class ProblemSolver {
 	}
 
 	public void kRandom(int k) {
-		long end = System.currentTimeMillis() + 10000;
+		long start = System.currentTimeMillis(), end = start + 10000;
 		randomPermutation();
 		int[] bestSolution;
 		int bestDistance = distance;
 		bestSolution = solution.clone();
 
-		for (int i = 1; i < k  && System.currentTimeMillis() < end; i++) {
+		for (int i = 1; i < k/* && System.currentTimeMillis() < end*/; i++) {
 			randomPermutation();
 			if(bestDistance > distance) {
 				bestDistance = distance;
@@ -111,6 +111,7 @@ public abstract class ProblemSolver {
 		}
 		solution = bestSolution.clone();
 		distance = bestDistance;
+		System.out.println("czas: " + (System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -143,6 +144,7 @@ public abstract class ProblemSolver {
 	}
 
 	public void nearestNeighbour() {
+		long start = System.currentTimeMillis();
 		int[] bestSolution;
 		nearestSingleNeighbour(1);
 		int bestDistance = distance;
@@ -156,6 +158,7 @@ public abstract class ProblemSolver {
 		}
 		solution = bestSolution.clone();
 		distance = bestDistance;
+		System.out.println("czas: " + (System.currentTimeMillis() - start));
 	}
 
 	/*public void nearestNeighboursRec(int k, int distance) {
@@ -246,12 +249,11 @@ public abstract class ProblemSolver {
 	public void twoOpt() {
 		long start = System.currentTimeMillis(), end = start + 10000;
 		//randomPermutation();
-		//nearestNeighbour();
+		nearestNeighbour();
 		int[] edgesToCut = new int[2];
 		boolean changes;
 
 		do {
-			System.out.println(this);
 			changes = cutEdges(edgesToCut);
 			if (changes) {
 				for (int i = edgesToCut[0] + 1; i < (edgesToCut[1] + edgesToCut[0] + 3) / 2; i++) {
@@ -261,8 +263,8 @@ public abstract class ProblemSolver {
 					solution[index] = tmp;
 				}
 			}
-		} while (changes && System.currentTimeMillis() < end);
-		//System.out.println(System.currentTimeMillis() - start);
+		} while (changes/* && System.currentTimeMillis() < end*/);
+		System.out.println("czas: " + (System.currentTimeMillis() - start));
 	}
 
 	public void kOpt(int k) {
@@ -287,7 +289,6 @@ public abstract class ProblemSolver {
 				}
 				revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] - 1);
 			}
-			System.out.println(this);
 			finalPermutation = null;
 			initPermutation(k, 0);
 			if (finalPermutation != null) {
@@ -310,7 +311,7 @@ public abstract class ProblemSolver {
 				solution = tmpSolution.clone();
 			}
 		} while (finalPermutation != null);
-		System.out.println(this);
+//		System.out.println(System.currentTimeMillis() - start);
 	}
 
 	private void initPermutation(int k, int l) {

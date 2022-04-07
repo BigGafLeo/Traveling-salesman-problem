@@ -267,6 +267,7 @@ public abstract class ProblemSolver {
 
 	public void kOpt(int k) {
 		//randomPermutation();
+		long start = System.currentTimeMillis();
 		corrCity = new int[dimension];
 		finalCorrCity = new int[dimension];
 		permutation = new int[k];

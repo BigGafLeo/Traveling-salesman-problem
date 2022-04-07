@@ -19,13 +19,12 @@ public class Tests {
         try {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKRandom_UponK_.csv");
-            CSVWriter csvWriter = new CSVWriter(writer);
-            problemSolver = new SymmetricProblemSolver(matrix);
+            problemSolver = new AsymmetricProblemSolver(matrix);
             for(int k = 1; k <= 1000; k+=10) {
                 problemSolver.kRandom(k);
-                csvWriter.writeNext(new String[]{Integer.toString(k), Double.toString(problemSolver.getDistance() / optimal)});
+                writer.println(k + ";" + problemSolver.getDistance() / optimal);
             }
-            csvWriter.close();
+            writer.close();
         } catch (WrongFileFormatException | IOException e) {
             e.printStackTrace();
         }
@@ -34,7 +33,7 @@ public class Tests {
     static public void TestKOpt_UponK(String dir, int optimal)
     {
         Matrix matrix;
-        AsymmetricProblemSolver problemSolver;
+        SymmetricProblemSolver problemSolver;
         try {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKOpt_UponK_.csv");
@@ -42,7 +41,7 @@ public class Tests {
             problemSolver = new AsymmetricProblemSolver(matrix);
             problemSolver.randomPermutation();
             int[] initialSolution = problemSolver.getSolution();
-            for(int k = 2; k <= 4; k++) {
+            for(int k = 2; k <= 3; k++) {
                 problemSolver.kOpt(k);
                 csvWriter.writeNext(new String[]{Integer.toString(k), Double.toString(problemSolver.getDistance() / optimal)});
                 System.out.println("\n\n\n");
@@ -54,7 +53,7 @@ public class Tests {
         }
     }
 
-    public void compare() {
+    static public void compare() {
         File dir_atsp = new File("data/ALL_atsp");
         String[] atsp_files = dir_atsp.list();
         File dir_tsp = new File("data/ALL_tsp");
@@ -90,7 +89,7 @@ public class Tests {
             }
         }
         System.out.println("\nSymmetric problem:");
-        for(int i = 0 ; i < tsp_distance.length; i++)
+        for(int i = 0 ; i < tsp_distance[1].length; i++)
         {
             try {
                 matrix = FileManager.readFile("data/ALL_tsp/" + tsp_files[i]);
@@ -134,6 +133,10 @@ public class Tests {
         } catch (FileNotFoundException | WrongFileFormatException e) {
             e.printStackTrace();
         }*/
-        TestKOpt_UponK("data/ALL_atsp/ft53.atsp", 6905);
+     //   TestKOpt_UponK("data/ALL_tsp/Ch130.tsp", 6110);
+     //   TestKRandom_UponK( "data/ALL_atsp/p43.atsp", 5620);
+
+     //   compare();
+        TestAlgorithms("data/ALL_atsp/rbg443.atsp", 2720);
     }
 }

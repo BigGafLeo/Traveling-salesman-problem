@@ -273,14 +273,85 @@ public abstract class ProblemSolver {
 		long end = System.currentTimeMillis() + 10000;
 		bestDistance = distance;
 		do {
-			kOpt(2);
+			kOpt(k);
+			System.out.println(this);
+			tabuTable[tabuIterator] = solution.clone();
 			if (distance < bestDistance) {
 				bestDistance = distance;
 				bestSolution = solution.clone();
 			}
+			if (tabuIterator == 99)
+				isTabuExtended = true;
+			tabuIterator = (tabuIterator + 1) % 100;
 		} while (System.currentTimeMillis() < end);
 		solution = bestSolution.clone();
 		distance = bestDistance;
+	}
+
+	protected void recreateSolution(int k, int[] permutation, int[] corrCity, boolean[] booleanArray) {
+		tmpSolution = new int[dimension];
+		int j = 0;
+		int a = permutation[0];
+		int b = corrCity[permutation[0]];
+		if (booleanArray[0]) {
+			for (int l = b + a; l >= b; l--) {
+				tmpSolution[j++] = solution[l % dimension];
+			}
+		} else {
+			for (int l = 0; l <= a; l++) {
+				tmpSolution[j++] = solution[l];
+			}
+		}
+		for (int i = 1; i < k; i++) {
+			a = permutation[i];
+			b = corrCity[permutation[i]];
+			if (booleanArray[i]) {
+				for (int l = a; l >= b; l--) {
+					tmpSolution[j++] = solution[l];
+				}
+			} else {
+				for (int l = b; l <= a; l++) {
+					tmpSolution[j++] = solution[l];
+				}
+			}
+		}
+		a = permutation[0];
+		b = corrCity[permutation[0]];
+		b += (b == 0 ? dimension : 0);
+		if (booleanArray[0]) {
+			for (int l = a + dimension; l >= a + 1 + b; l--) {
+				tmpSolution[j++] = solution[l % dimension];
+			}
+		} else {
+			for (int l = b; l <= dimension - 1; l++) {
+				tmpSolution[j++] = solution[l];
+			}
+		}
+	}
+
+	protected boolean isAcceptable(int k, int[] permutation, int[] corrCity, boolean[] booleanArray) {
+		int iterator = (isTabuExtended ? 100 : tabuIterator) - 1;
+		int i = tabuIterator + 99;
+		recreateSolution(k, permutation, corrCity, booleanArray);
+		while (iterator >= 0) {
+			int j = 0, l;
+			while (tabuTable[i % 100][0] != tmpSolution[j]) {
+				j++;
+			}
+			j++;
+			for (l = 1; l < dimension; l++) {
+				if (tabuTable[i % 100][l] != tmpSolution[j % dimension]) {
+					break;
+				}
+				j++;
+			}
+			if (l == dimension) {
+				return false;
+			}
+			i--;
+			iterator--;
+		}
+		return true;
 	}
 
 	public void kOpt(int k, boolean multiCheck) {

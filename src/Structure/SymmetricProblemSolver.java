@@ -17,7 +17,7 @@ public class SymmetricProblemSolver extends ProblemSolver {
                         matrix.get(solution[j % dimension] - 1, solution[(j + 1) % dimension] - 1);
                 tmpDistance += matrix.get(solution[i] - 1, solution[j % dimension] - 1) +
                         matrix.get(solution[i + 1] - 1, solution[(j + 1) % dimension] - 1);
-                if (tmpDistance < distance) {
+                if (tmpDistance < distance ) {
                     distance = tmpDistance;
                     edgesToCut[0] = i;
                     edgesToCut[1] = j;

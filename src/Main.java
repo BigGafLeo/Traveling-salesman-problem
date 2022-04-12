@@ -40,7 +40,7 @@ public class Main {
         main.problemSolver = main.structure.isSymmetric() ? new SymmetricProblemSolver(main.structure)
                 : new AsymmetricProblemSolver(main.structure);
         main.problemSolver.randomPermutation();
-        main.problemSolver.kOpt(4);
+        main.problemSolver.kOpt(4, true);
         System.out.println(main.problemSolver.toString());
     }
 }

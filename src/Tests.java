@@ -39,7 +39,7 @@ public class Tests {
             problemSolver.randomPermutation();
             int[] initialSolution = problemSolver.getSolution();
             for(int k = 2; k <= 3; k++) {
-                problemSolver.kOpt(k);
+                problemSolver.kOpt(k, true);
                 writer.println(k + ";" + problemSolver.getDistance() / optimal);
                 problemSolver.setSolution(initialSolution);
             }
@@ -55,7 +55,6 @@ public class Tests {
         AsymmetricProblemSolver problemSolver;
         try {
             matrix = FileManager.readFile(dir);
-            PrintWriter writer = new PrintWriter(dir+"TestAlgorithms_.csv");
             problemSolver = new AsymmetricProblemSolver(matrix);
             /*problemSolver.kRandom(50000);
             System.out.println("jakosc: " + problemSolver.getDistance() / optimal);

@@ -5,15 +5,39 @@ import java.util.Arrays;
 
 public abstract class ProblemSolver {
 	protected final int dimension;
+
 	protected int[] solution;
 	protected int[] tmpSolution;
-	protected final Matrix matrix;
-
-	protected int bestDistance;
-	protected int[] bestSolution;
-	protected boolean isInitiated;
 	/**
-	 * Długość możliwie najktótszej drogi.
+	 * Najlepsze z dotychczas napotkanych rozwiązań w tabuSearch.
+	 */
+	protected int[] bestSolution;
+
+	protected final Matrix matrix;
+	/**
+	 * Flaga sprawdzająca, czy tablica tabuTable osiągneła rozmiar 100 elementów.
+	 */
+	protected boolean isTabuExtended;
+	/**
+	 * Tablica tabu.
+	 */
+	protected int[][] tabuTable;
+	/**
+	 * Iterator idący po tablicy tabu w algorytmie tabuSearch.
+	 */
+	protected int tabuIterator;
+	/**
+	 * Flaga sprawdzająca, czy rozwiązanie zostało zainicjowane
+	 * (używana w algorytmach kOpt i nearestNeighbours).
+	 */
+	protected boolean isInitiated;
+
+	/**
+	 * Długość możliwie najkrótszej drogi w tabuSearch.
+	 */
+	protected int bestDistance;
+	/**
+	 * Długość możliwie najkrótszej drogi (w przypadku tabuSearch najkrótszej drogi otoczenia).
 	 */
 	protected int distance;
 	/**
@@ -248,13 +272,12 @@ public abstract class ProblemSolver {
 
 	protected abstract boolean cutEdges(int[] edgesToCut);
 
-	public void twoOpt() {
+	public void twoOpt(boolean multiCheck) {
 		//long start = System.currentTimeMillis(), end = start + 10000;
 		//randomPermutation();
 		nearestNeighbour();
 		int[] edgesToCut = new int[2];
 		boolean changes;
-
 		do {
 			changes = cutEdges(edgesToCut);
 			if (changes) {
@@ -265,13 +288,20 @@ public abstract class ProblemSolver {
 					solution[index] = tmp;
 				}
 			}
-		} while (changes/* && System.currentTimeMillis() < end*/);
+		} while (multiCheck && changes/* && System.currentTimeMillis() < end*/);
 		//System.out.println("czas: " + (System.currentTimeMillis() - start));
 	}
 
-	public void tabuSearch() {
-		long end = System.currentTimeMillis() + 10000;
+	public void tabuSearch(int k) {
+		randomPermutation();
+		System.out.println(this);
+		tabuIterator = 0;
+		long end = System.currentTimeMillis() + 1000;
+		tabuTable = new int[100][dimension];
 		bestDistance = distance;
+		bestSolution = solution.clone();
+		isTabuExtended = false;
+		initKOpt(k);
 		do {
 			kOpt(k);
 			System.out.println(this);
@@ -357,6 +387,7 @@ public abstract class ProblemSolver {
 	public void kOpt(int k, boolean multiCheck) {
 		//long start = System.currentTimeMillis();
 		initKOpt(k);
+		tabuTable = null;
 		int tmpDistance;
 		do {
 			tmpDistance = distance;
@@ -387,35 +418,22 @@ public abstract class ProblemSolver {
 			}
 			revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] - 1);
 		}
-		int tmpDistance = distance;
+		//int tmpDistance = distance;
 		isInitiated = false;
 		initPermutation(k, 0);
-		if (tmpDistance > distance) {
-			int[] tmpSolution = new int[dimension];
-			int j = 0;
-			for (int i = 0; i < k; i++) {
-				int a = finalPermutation[i];
-				int b = finalCorrCity[finalPermutation[i]];
-				a += (a < b ? dimension : 0);
-				if (finalBooleanArray[i]) {
-					for (int l = a; l >= b; l--) {
-						tmpSolution[j++] = solution[l % dimension];
-					}
-				} else {
-					for (int l = b; l <= a; l++) {
-						tmpSolution[j++] = solution[l % dimension];
-					}
-				}
-			}
-			solution = tmpSolution.clone();
-		}
+		recreateSolution(k, finalPermutation, finalCorrCity, finalBooleanArray);
+		solution = tmpSolution.clone();
+		/*if (tmpDistance > distance) {
+
+		}*/
 	}
 
 	private void initPermutation(int k, int l) {
 		if (l == k) {
 			int tmpDistance = distance;
+			boolean tmpIsInitiated = isInitiated;
 			initBooleanArray(k, (this instanceof SymmetricProblemSolver ? 1 : 0), firstDistance);
-			if (tmpDistance > distance) {
+			if (!tmpIsInitiated || tmpDistance > distance) {
 				for (int i = 0; i < k; i++) {
 					finalCorrCity[permutation[i]] = corrCity[permutation[i]];
 				}
@@ -436,7 +454,9 @@ public abstract class ProblemSolver {
 
 	private void initBooleanArray(int k, int l, int distance) {
 		if (l == k) {
-			if (distance < this.distance) {
+			if ((!isInitiated || distance < this.distance)
+					&& (tabuTable == null || isAcceptable(k, permutation, corrCity, booleanArray))) {
+				isInitiated = true;
 				this.distance = distance;
 				finalPermutation = permutation.clone();
 				finalBooleanArray = booleanArray.clone();
@@ -515,7 +535,8 @@ public abstract class ProblemSolver {
 			helpBooleanArray[i + j] = !helpBooleanArray[i + j + 1];
 			helpBooleanArray[i + j + 1] = tmpBool;
 
-			if (!isInitiated || helpDistance < distance) {
+			if ((!isInitiated || helpDistance < distance)
+					&& (tabuTable == null || isAcceptable(k, helpPermutation, corrCity, helpBooleanArray))) {
 				isInitiated = true;
 				distance = helpDistance;
 				finalPermutation = helpPermutation.clone();

@@ -63,7 +63,7 @@ public class Tests {
             System.out.println("jakosc: " + problemSolver.getDistance() / optimal);
             System.out.println("odleglosc: " + problemSolver.getDistance());*/
             //problemSolver.randomPermutation();
-            problemSolver.twoOpt();
+            problemSolver.twoOpt(true);
             System.out.println("jakosc: " + problemSolver.getDistance() / optimal);
             System.out.println("odleglosc: " + problemSolver.getDistance());
         } catch (WrongFileFormatException | IOException e) {
@@ -99,7 +99,7 @@ public class Tests {
                 atsp_distance[0][i] = asymmetricProblemSolver.getDistance();
                 asymmetricProblemSolver.nearestNeighbour();
                 atsp_distance[1][i] = asymmetricProblemSolver.getDistance();
-                asymmetricProblemSolver.twoOpt();
+                asymmetricProblemSolver.twoOpt(true);
                 atsp_distance[2][i] = asymmetricProblemSolver.getDistance();
                 System.out.println(atsp_distance[0][i] + " " + atsp_distance[1][i] + " " + atsp_distance[2][i]);
             } catch (FileNotFoundException | WrongFileFormatException e) {
@@ -116,7 +116,7 @@ public class Tests {
                 tsp_distance[0][i] = symmetricProblemSolver.getDistance();
                 symmetricProblemSolver.nearestNeighbour();
                 tsp_distance[1][i] = symmetricProblemSolver.getDistance();
-                symmetricProblemSolver.twoOpt();
+                symmetricProblemSolver.twoOpt(true);
                 tsp_distance[2][i] = symmetricProblemSolver.getDistance();
                 System.out.println(tsp_distance[0][i] + " " + tsp_distance[1][i] + " " + tsp_distance[2][i]);
             } catch (FileNotFoundException | WrongFileFormatException e) {
@@ -141,20 +141,7 @@ public class Tests {
     }
 
     public static void main(String[] args) {
-        /*try {
-            matrix = FileManager.readFile("data/ALL_tsp/ch150.tsp");
-            symmetricProblemSolver = new SymmetricProblemSolver(matrix);
-            symmetricProblemSolver.kRandom(10000);
-            System.out.println(symmetricProblemSolver.getDistance());
-            symmetricProblemSolver.twoOpt();
-            System.out.println(symmetricProblemSolver.getDistance());
-        } catch (FileNotFoundException | WrongFileFormatException e) {
-            e.printStackTrace();
-        }*/
-     //   TestKOpt_UponK("data/ALL_tsp/Ch130.tsp", 6110);
-     //   TestKRandom_UponK( "data/ALL_atsp/p43.atsp", 5620);
-
-     //   compare();
-        TestAlgorithms("data/ALL_atsp/rbg443.atsp", 2720);
+        //compare();
+        //TestAlgorithms("data/ALL_atsp/rbg443.atsp", 2720);
     }
 }

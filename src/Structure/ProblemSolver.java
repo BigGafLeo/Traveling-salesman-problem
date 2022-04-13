@@ -418,14 +418,13 @@ public abstract class ProblemSolver {
 			}
 			revFirstDistance = distances[1][0] + matrix.get(solution[0] - 1, solution[dimension - 1] - 1);
 		}
-		//int tmpDistance = distance;
+		int tmpDistance = distance;
 		isInitiated = false;
 		initPermutation(k, 0);
-		recreateSolution(k, finalPermutation, finalCorrCity, finalBooleanArray);
-		solution = tmpSolution.clone();
-		/*if (tmpDistance > distance) {
-
-		}*/
+		if (tmpDistance > distance || tabuTable != null) {
+			recreateSolution(k, finalPermutation, finalCorrCity, finalBooleanArray);
+			solution = tmpSolution.clone();
+		}
 	}
 
 	private void initPermutation(int k, int l) {

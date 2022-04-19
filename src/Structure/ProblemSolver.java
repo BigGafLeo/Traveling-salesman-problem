@@ -384,6 +384,44 @@ public abstract class ProblemSolver {
 		return true;
 	}
 
+	protected void insert() {
+		int a, b;
+		firstDistance = distance;
+		for (int i = 0; i < dimension; i++) {
+			distance = firstDistance;
+			distance -= matrix.get(solution[(i - 1 + dimension) % dimension], solution[i])
+					+ matrix.get(solution[i], solution[(i + 1) % dimension])
+					+ matrix.get(solution[(i + 1) % dimension], solution[(i + 2) % dimension]);
+			distance += matrix.get(solution[(i - 1 + dimension) % dimension], solution[(i + 1) % dimension])
+					+ matrix.get(solution[(i + 1) % dimension], solution[i])
+					+ matrix.get(solution[i], solution[(i + 2) % dimension]);
+			if (distance < bestDistance || i == 0) {
+				bestDistance = distance;
+				a = i;
+				b = (i + 1) % dimension;
+				// TODO: sprawdzanie na liście tabu
+			}
+
+			for (int j = i + 2; j < i + dimension; j++) {
+				distance -= matrix.get(solution[(j - 1 + dimension) % dimension], solution[i])
+						- matrix.get(solution[j % dimension],solution[(j + 1) % dimension]);
+				distance += matrix.get(solution[(j - 1 + dimension) % dimension],solution[j % dimension])
+						+ matrix.get(solution[i],solution[(j + 1) % dimension]);
+				if (this instanceof AsymmetricProblemSolver) {
+					distance += matrix.get(solution[i], solution[j % dimension])
+							- matrix.get(solution[j % dimension], solution[i]);
+				}
+				if (distance < bestDistance) {
+					bestDistance = distance;
+					a = i;
+					b = j % dimension;
+					// TODO: sprawdzanie na liście tabu
+				}
+			}
+		}
+		// TODO: Dodanie do tabu a oraz b
+	}
+
 	public void kOpt(int k, boolean multiCheck) {
 		//long start = System.currentTimeMillis();
 		initKOpt(k);

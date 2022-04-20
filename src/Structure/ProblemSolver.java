@@ -25,6 +25,7 @@ public abstract class ProblemSolver {
 	/**
 	 * Iterator idący po tablicy tabu w algorytmie tabuSearch.
 	 */
+	int tabuTableSize = 10000;
 	protected int tabuIterator;
 	/**
 	 * Flaga sprawdzająca, czy rozwiązanie zostało zainicjowane
@@ -310,7 +311,7 @@ public abstract class ProblemSolver {
 				bestDistance = distance;
 				bestSolution = solution.clone();
 			}
-			if (tabuIterator == 99)
+			if (tabuIterator == tabuTableSize - 1)
 				isTabuExtended = true;
 			tabuIterator = (tabuIterator + 1) % 100;
 		} while (System.currentTimeMillis() < end);

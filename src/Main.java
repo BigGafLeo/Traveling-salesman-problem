@@ -1,5 +1,9 @@
 import Structure.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 public class Main {
 
     private Matrix structure;
@@ -40,7 +44,33 @@ public class Main {
         main.problemSolver = main.structure.isSymmetric() ? new SymmetricProblemSolver(main.structure)
                 : new AsymmetricProblemSolver(main.structure);
         main.problemSolver.randomPermutation();
-        main.problemSolver.tabuSearch(2);
-        System.out.println(main.problemSolver.toString());
+        PrintStream ps;
+        try {
+            main.structure = FileManager.readFile("data/ALL_atsp/rbg443.atsp");
+            main.problemSolver = new AsymmetricProblemSolver(main.structure);
+            main.problemSolver.randomPermutation();
+            int[] initialSolution = main.problemSolver.getSolution();
+            ps = new PrintStream(new FileOutputStream("swap.csv"));
+            System.setOut(ps);
+            main.problemSolver.tabuSearch(0);
+            System.out.println(main.problemSolver.toString());
+            main.problemSolver.setSolution(initialSolution);
+            ps = new PrintStream(new FileOutputStream("insert.csv"));
+            System.setOut(ps);
+            main.problemSolver.tabuSearch(1);
+            System.out.println(main.problemSolver.toString());
+            main.problemSolver.setSolution(initialSolution);
+            ps = new PrintStream(new FileOutputStream("invert.csv"));
+            System.setOut(ps);
+            main.problemSolver.tabuSearch(2);
+            System.out.println(main.problemSolver.toString());
+            main.problemSolver.setSolution(initialSolution);
+            ps = new PrintStream(new FileOutputStream("30pt.csv"));
+            System.setOut(ps);
+            main.problemSolver.tabuSearch(3);
+            System.out.println(main.problemSolver.toString());
+        } catch (FileNotFoundException | WrongFileFormatException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -297,8 +297,13 @@ public abstract class ProblemSolver {
 		//randomPermutation();
 		System.out.println(this);
 		tabuIterator = 0;
-		long start = System.currentTimeMillis(), end = start + 60000, time = start + 1000;
-		tabuTable = new int[tabuTableSize][dimension];
+		long start = System.currentTimeMillis(), end = start + 30000, time = start + 1000;
+		if (k < 2) {
+			tabuTable = new int[tabuTableSize][2];
+		} else {
+			tabuTable = new int[tabuTableSize][k];
+			booleanTabuTable = new boolean[tabuTableSize][k];
+		}
 		bestDistance = distance;
 		bestSolution = solution.clone();
 		isTabuExtended = false;
@@ -311,11 +316,25 @@ public abstract class ProblemSolver {
 				case 1 -> insert();
 				default -> kOpt(k);
 			}
-			tabuTable[tabuIterator] = solution.clone();
-			if (distance < bestDistance) {
+			if (lastDistance != null && distance >= lastDistance) {
+				worseCounter++;
+				if (worseCounter == kickFrequency) {
+					// TODO: kick
+
+					randomPermutation(); // zaczynamy od nowa
+
+					isTabuExtended = false;
+					tabuIterator = 0;
+					lastDistance = null;
+					worseCounter = 0;
+					kickFrequency *= 1.1;
+					continue;
+				}
+			} else if (distance < bestDistance) {
 				bestDistance = distance;
 				bestSolution = solution.clone();
 			}
+			lastDistance = distance;
 			if (tabuIterator == tabuTableSize - 1)
 				isTabuExtended = true;
 			tabuIterator = (tabuIterator + 1) % tabuTableSize;
@@ -386,6 +405,19 @@ public abstract class ProblemSolver {
 				j++;
 			}
 			if (l == dimension) {
+				return false;
+			}
+			i--;
+			iterator--;
+		}
+		return true;
+	}
+
+	protected boolean isAcceptable(int[] permutation, boolean[] booleanArray){
+		int iterator = (isTabuExtended ? tabuTableSize : tabuIterator) - 1;
+		int i = tabuIterator + tabuTableSize - 1;
+		while (iterator >= 0) {
+			if (Arrays.equals(tabuTable[i % tabuTableSize], permutation) && Arrays.equals(booleanTabuTable[i % tabuTableSize], booleanArray)) {
 				return false;
 			}
 			i--;

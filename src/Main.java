@@ -65,7 +65,7 @@ public class Main {
             main.problemSolver.tabuSearch(2);
             System.out.println(main.problemSolver.toString());
             main.problemSolver.setSolution(initialSolution);
-            ps = new PrintStream(new FileOutputStream("30pt.csv"));
+            ps = new PrintStream(new FileOutputStream(name + "k0pt.csv"));
             System.setOut(ps);
             main.problemSolver.tabuSearch(3);
             System.out.println(main.problemSolver.toString());

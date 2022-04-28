@@ -8,8 +8,8 @@ public class SymmetricProblemSolver extends ProblemSolver {
 
     @Override
     protected boolean cutEdges(int[] edgesToCut) {
-        boolean changes = false;
-        int firstDistance = distance;
+        isInitiated = false;
+        firstDistance = distance;
         for (int i = 0; i < dimension - 2; i++) {
             for (int j = i + 2; j < dimension - (i == 0 ? 1 : 0); j++) {
                 int tmpDistance = firstDistance;
@@ -17,14 +17,14 @@ public class SymmetricProblemSolver extends ProblemSolver {
                         matrix.get(solution[j % dimension] - 1, solution[(j + 1) % dimension] - 1);
                 tmpDistance += matrix.get(solution[i] - 1, solution[j % dimension] - 1) +
                         matrix.get(solution[i + 1] - 1, solution[(j + 1) % dimension] - 1);
-                if (tmpDistance < distance ) {
+                if ((tmpDistance < distance || !isInitiated) && (tabuTable == null || isAcceptable(solution[i], solution[j]))) {
+                    isInitiated = true;
                     distance = tmpDistance;
                     edgesToCut[0] = i;
                     edgesToCut[1] = j;
-                    changes = true;
                 }
             }
         }
-        return changes;
+        return distance < firstDistance;
     }
 }

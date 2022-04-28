@@ -46,29 +46,26 @@ public class Main {
         main.problemSolver.randomPermutation();
         PrintStream ps;
         try {
-            main.structure = FileManager.readFile("data/ALL_atsp/rbg443.atsp");
+            String name = "ftv170";
+            main.structure = FileManager.readFile("data/ALL_atsp/" + name + ".atsp");
             main.problemSolver = new AsymmetricProblemSolver(main.structure);
             main.problemSolver.randomPermutation();
             int[] initialSolution = main.problemSolver.getSolution();
-            ps = new PrintStream(new FileOutputStream("swap.csv"));
+            /*ps = new PrintStream(new FileOutputStream(name + "swap.csv"));
             System.setOut(ps);
             main.problemSolver.tabuSearch(0);
-            System.out.println(main.problemSolver.toString());
             main.problemSolver.setSolution(initialSolution);
-            ps = new PrintStream(new FileOutputStream("insert.csv"));
+            ps = new PrintStream(new FileOutputStream(name + "insert.csv"));
             System.setOut(ps);
             main.problemSolver.tabuSearch(1);
-            System.out.println(main.problemSolver.toString());
-            main.problemSolver.setSolution(initialSolution);
-            ps = new PrintStream(new FileOutputStream("invert.csv"));
+            main.problemSolver.setSolution(initialSolution);*/
+            ps = new PrintStream(new FileOutputStream(name + "invert.csv"));
             System.setOut(ps);
             main.problemSolver.tabuSearch(2);
-            System.out.println(main.problemSolver.toString());
             main.problemSolver.setSolution(initialSolution);
             ps = new PrintStream(new FileOutputStream(name + "k0pt.csv"));
             System.setOut(ps);
-            main.problemSolver.tabuSearch(3);
-            System.out.println(main.problemSolver.toString());
+            main.problemSolver.tabuSearch(-1);
         } catch (FileNotFoundException | WrongFileFormatException e) {
             e.printStackTrace();
         }

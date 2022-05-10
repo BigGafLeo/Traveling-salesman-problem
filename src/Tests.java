@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class Tests {
 
-    static public void TestKRandom_UponK(String dir, int optimal)
+    static public void testKRandomUponK(String dir, int optimal)
     {
         Matrix matrix;
         AsymmetricProblemSolver problemSolver;
@@ -18,7 +18,7 @@ public class Tests {
             matrix = FileManager.readFile(dir);
             PrintWriter writer = new PrintWriter(dir+"TestKRandom_UponK_.csv");
             problemSolver = new AsymmetricProblemSolver(matrix);
-            for(int k = 1; k <= 1000; k+=10) {
+            for (int k = 1; k <= 1000; k += 10) {
                 problemSolver.kRandom(k);
                 writer.println(k + ";" + problemSolver.getDistance() / optimal);
             }
@@ -28,7 +28,7 @@ public class Tests {
         }
     }
 
-    static public void TestKOpt_UponK(String dir, int optimal)
+    static public void testKOptUponK(String dir, int optimal)
     {
         Matrix matrix;
         SymmetricProblemSolver problemSolver;
@@ -38,7 +38,7 @@ public class Tests {
             problemSolver = new SymmetricProblemSolver(matrix);
             problemSolver.randomPermutation();
             int[] initialSolution = problemSolver.getSolution();
-            for(int k = 2; k <= 3; k++) {
+            for (int k = 2; k <= 3; k++) {
                 problemSolver.kOpt(k, true);
                 writer.println(k + ";" + problemSolver.getDistance() / optimal);
                 problemSolver.setSolution(initialSolution);
@@ -49,7 +49,7 @@ public class Tests {
         }
     }
 
-    static public void TestAlgorithms(String dir, int optimal)
+    static public void testAlgorithms(String dir, int optimal)
     {
         Matrix matrix;
         AsymmetricProblemSolver problemSolver;

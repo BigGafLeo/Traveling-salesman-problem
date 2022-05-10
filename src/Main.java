@@ -46,9 +46,9 @@ public class Main {
         main.problemSolver.randomPermutation();
         PrintStream ps;
         try {
-            String name = "ftv170";
-            main.structure = FileManager.readFile("data/ALL_atsp/" + name + ".atsp");
-            main.problemSolver = new AsymmetricProblemSolver(main.structure);
+            String name = "fl417";
+            main.structure = FileManager.readFile("data/ALL_tsp/" + name + ".tsp");
+            main.problemSolver = new SymmetricProblemSolver(main.structure);
             main.problemSolver.randomPermutation();
             int[] initialSolution = main.problemSolver.getSolution();
             ps = new PrintStream(new FileOutputStream(name + "swap.csv"));

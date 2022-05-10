@@ -1,9 +1,10 @@
+
 package Structure;
 
-import java.util.*;
-import java.util.Arrays;
+		import java.util.*;
+		import java.util.Arrays;
 
-public abstract class ProblemSolver {
+public abstract class ProblemSolverMultiThread extends Thread {
 	protected final int dimension;
 
 	protected int[] solution;
@@ -107,7 +108,7 @@ public abstract class ProblemSolver {
 	 */
 	protected int[] finalCorrCity;
 
-	public ProblemSolver(Matrix matrix) {
+	public ProblemSolverMultiThread(Matrix matrix) {
 		this.matrix=matrix;
 		this.dimension = matrix.getDimension();
 		solution = new int[dimension];
@@ -498,7 +499,7 @@ public abstract class ProblemSolver {
 					+ matrix.get(solution[(i + 1) % dimension] - 1, solution[(i + 2) % dimension] - 1);
 			helpDistance += matrix.get(solution[(i - 1 + dimension) % dimension] - 1, solution[(i + 1) % dimension] - 1)
 					+ matrix.get(solution[i] - 1, solution[(i + 2) % dimension] - 1);
-			if (this instanceof AsymmetricProblemSolver) {
+			if (this instanceof AsymmetricProblemSolverMultiThread) {
 				helpDistance += matrix.get(solution[(i + 1) % dimension] - 1, solution[i] - 1)
 						- matrix.get(solution[i] - 1, solution[(i + 1) % dimension] - 1);
 			}
@@ -568,7 +569,7 @@ public abstract class ProblemSolver {
 					+ matrix.get(solution[(i + 1) % dimension] - 1, solution[(i + 2) % dimension] - 1);
 			helpDistance += matrix.get(solution[(i - 1 + dimension) % dimension] - 1, solution[(i + 1) % dimension] - 1)
 					+ matrix.get(solution[i] - 1, solution[(i + 2) % dimension] - 1);
-			if (this instanceof AsymmetricProblemSolver) {
+			if (this instanceof AsymmetricProblemSolverMultiThread) {
 				helpDistance += matrix.get(solution[(i + 1) % dimension] - 1, solution[i] - 1)
 						- matrix.get(solution[i] - 1, solution[(i + 1) % dimension] - 1);
 			}
@@ -584,7 +585,7 @@ public abstract class ProblemSolver {
 						+ matrix.get(solution[j % dimension] - 1,solution[(j + 1) % dimension] - 1);
 				helpDistance += matrix.get(solution[(j - 1 + dimension) % dimension] - 1,solution[j % dimension] - 1)
 						+ matrix.get(solution[i] - 1,solution[(j + 1) % dimension] - 1);
-				if (this instanceof AsymmetricProblemSolver) {
+				if (this instanceof AsymmetricProblemSolverMultiThread) {
 					helpDistance += matrix.get(solution[j % dimension] - 1, solution[i] - 1)
 							- matrix.get(solution[i] - 1, solution[j % dimension] - 1);
 				}
@@ -630,7 +631,7 @@ public abstract class ProblemSolver {
 
 	private void kOpt(int k) {
 		firstDistance = distance;
-		if (this instanceof SymmetricProblemSolver) {
+		if (this instanceof SymmetricProblemSolverMultiThread) {
 			booleanArray[0] = false;
 		} else {
 			distances = new int[2][dimension];
@@ -672,7 +673,7 @@ public abstract class ProblemSolver {
 		if (l == k) {
 			int tmpDistance = distance;
 			boolean tmpIsInitiated = isInitiated;
-			initBooleanArray(k, (this instanceof SymmetricProblemSolver ? 1 : 0), firstDistance);
+			initBooleanArray(k, (this instanceof SymmetricProblemSolverMultiThread ? 1 : 0), firstDistance);
 			if (!tmpIsInitiated || tmpDistance > distance) {
 				firstPermutation = permutation.clone();
 				for (int i = 0; i < k; i++) {
@@ -716,7 +717,7 @@ public abstract class ProblemSolver {
 		int m4 = solution[l < k - 1 ? (permutation[l] + 1) % dimension : (booleanArray[0] ? permutation[0] : corrCity[permutation[0]])];
 		distance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
 		distance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
-		if (this instanceof AsymmetricProblemSolver) {
+		if (this instanceof AsymmetricProblemSolverMultiThread) {
 			distance += distances[1][corrCity[permutation[l]]] - distances[1][permutation[l]]
 					- distances[0][permutation[l]] + distances[0][corrCity[permutation[l]]];
 			if (permutation[l] < corrCity[permutation[l]]) {
@@ -743,7 +744,7 @@ public abstract class ProblemSolver {
 			int m4 = solution[helpBooleanArray[(i + j + 2) % k] ? helpPermutation[(i + j + 2) % k] : corrCity[helpPermutation[(i + j + 2) % k]]];
 			helpDistance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
 			helpDistance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
-			if (this instanceof AsymmetricProblemSolver) {
+			if (this instanceof AsymmetricProblemSolverMultiThread) {
 				int a, b, c, d;
 				if (helpBooleanArray[i + j]) {
 					c = helpPermutation[i + j];
@@ -799,5 +800,23 @@ public abstract class ProblemSolver {
 	public void setSolution(int[] solution) {
 		this.solution = solution;
 		distance = matrix.distance(solution);
+	}
+
+	public void run(int k){
+		for (int i = 0; i < 1; i++)
+			switch (k){
+				case -1:
+					twoOpt();
+					break;
+				case 0:
+					swap();
+					break;
+				case 1:
+					insert();
+					break;
+				default:
+					kOpt(k);
+					break;
+			}
 	}
 }

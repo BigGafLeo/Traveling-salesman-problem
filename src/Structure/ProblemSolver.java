@@ -38,7 +38,6 @@ public abstract class ProblemSolver {
 	 * (używana w algorytmach kOpt i nearestNeighbours).
 	 */
 	protected boolean isInitiated;
-
 	/**
 	 * Długość możliwie najkrótszej drogi w tabuSearch.
 	 */
@@ -64,7 +63,6 @@ public abstract class ProblemSolver {
 	 * distances[1] - tablica długości odwróconej początkowej drogi prowadzącej od ostatniego miasta
 	 */
 	protected int[][] distances;
-
 	/**
 	 * Permutacja miast używana w funkcji initPermutation.
 	 */
@@ -77,7 +75,6 @@ public abstract class ProblemSolver {
 	 * Permutacja miast używana w funkcji permutations.
 	 */
 	protected int[] helpPermutation;
-
 	/**
 	 * Tablica używana do przechowania chwilowego stanu kolejności,
 	 * w jakich odwiedzane są miasta, które łączy nieprzerwana droga,
@@ -95,7 +92,6 @@ public abstract class ProblemSolver {
 	 * w jakich odwiedzane są miasta, które łączy nieprzerwana droga.
 	 */
 	protected boolean[] finalBooleanArray;
-
 	/**
 	 * Tablica przyporządkowująca jednemu z krańcowych miast drogi
 	 * drugie krańcowe miasto tej drogi.

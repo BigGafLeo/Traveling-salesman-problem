@@ -141,13 +141,13 @@ public class TabuSearchTests {
     }
 
     public static void main(String[] args) {
-        /*String[] files = {"eil51.tsp", "ch150.tsp", "d657.tsp", "u2152.tsp", "ftv33.atsp", "ftv70.atsp", "ftv170.atsp", "rbg323.atsp"};
+        String[] files = {"eil51.tsp", "ch150.tsp", "d657.tsp", "u2152.tsp", "ftv33.atsp", "ftv70.atsp", "ftv170.atsp", "rbg323.atsp"};
         for (String file : files) {
             testTabuSearch(file, 0);
             testTabuSearch(file, 1);
-        }*/
-        testTabuSearch("d493.tsp", 0);
-        testTabuSearch("d493.tsp", 1);
+        }
+        //testTabuSearch("d493.tsp", 0);
+        //testTabuSearch("d493.tsp", 1);
         //compare();
     }
 }

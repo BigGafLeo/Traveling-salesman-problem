@@ -51,7 +51,7 @@ public class Main {
             main.problemSolver = new SymmetricProblemSolver(main.structure);
             main.problemSolver.randomPermutation();
             int[] initialSolution = main.problemSolver.getSolution();
-            /*ps = new PrintStream(new FileOutputStream(name + "swap.csv"));
+            ps = new PrintStream(new FileOutputStream(name + "swap.csv"));
             System.setOut(ps);
             main.problemSolver.tabuSearch(0);
             main.problemSolver.setSolution(initialSolution);
@@ -61,8 +61,8 @@ public class Main {
             main.problemSolver.setSolution(initialSolution);
             ps = new PrintStream(new FileOutputStream(name + "invert.csv"));
             System.setOut(ps);
-            main.problemSolver.tabuSearch(-1);
-            main.problemSolver.setSolution(initialSolution);*/
+            main.problemSolver.tabuSearch(-1, true);
+            main.problemSolver.setSolution(initialSolution);
             ps = new PrintStream(new FileOutputStream(name + "k0pt.csv"));
             System.setOut(ps);
             main.problemSolver.tabuSearch(2);

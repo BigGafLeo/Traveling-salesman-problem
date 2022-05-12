@@ -17,7 +17,8 @@ public class SymmetricProblemSolver extends ProblemSolver {
                         matrix.get(solution[j % dimension] - 1, solution[(j + 1) % dimension] - 1);
                 tmpDistance += matrix.get(solution[i] - 1, solution[j % dimension] - 1) +
                         matrix.get(solution[i + 1] - 1, solution[(j + 1) % dimension] - 1);
-                if ((tmpDistance < distance || !isInitiated) && (tabuTable == null || isAcceptable(solution[i], solution[j]))) {
+                if ((tmpDistance < distance || !isInitiated) && (tabuTable == null || aspirationCriterion
+                        && helpDistance < bestDistance || isAcceptable(solution[i], solution[j]))) {
                     isInitiated = true;
                     distance = tmpDistance;
                     edgesToCut[0] = i;

@@ -18,7 +18,8 @@ public class AsymmetricProblemSolver extends ProblemSolver {
             tmpDistance += matrix.get(solution[0] - 1, solution[i] - 1)
                     + matrix.get(solution[1] - 1, solution[i + 1] - 1)
                     + matrix.get(solution[i] - 1, solution[i - 1] - 1);
-            if ((tmpDistance < distance || !isInitiated) && (tabuTable == null || isAcceptable(solution[0], solution[i]))) {
+            if ((tmpDistance < distance || !isInitiated) && (tabuTable == null || aspirationCriterion
+                    && helpDistance < bestDistance || isAcceptable(solution[0], solution[i]))) {
                 isInitiated = true;
                 distance = tmpDistance;
                 edgesToCut[0] = 0;
@@ -32,7 +33,8 @@ public class AsymmetricProblemSolver extends ProblemSolver {
                 tmpDistance += matrix.get(solution[(j + 1) % dimension] - 1, solution[(i + j + 1) % dimension] - 1)
                         + matrix.get(solution[(j + i) % dimension] - 1, solution[(i + j - 1) % dimension] - 1)
                         + matrix.get(solution[j - 1] - 1, solution[j] - 1);
-                if ((tmpDistance < distance || !isInitiated) && (tabuTable == null || isAcceptable(solution[j], solution[(j + i) % dimension]))) {
+                if ((tmpDistance < distance || !isInitiated) && (tabuTable == null || aspirationCriterion
+                        && helpDistance < bestDistance || isAcceptable(solution[j], solution[(j + i) % dimension]))) {
                     isInitiated = true;
                     distance = tmpDistance;
                     edgesToCut[0] = j;

@@ -1,4 +1,7 @@
-package Structure;
+package ProblemSolver;
+
+import ProblemSolver.ProblemSolver;
+import Structure.Matrix;
 
 public class AsymmetricProblemSolver extends ProblemSolver {
 

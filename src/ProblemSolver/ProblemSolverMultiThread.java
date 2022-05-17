@@ -1,9 +1,13 @@
-package Structure;
+package ProblemSolver;
 
-import java.util.*;
+import Structure.Matrix;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Random;
 
-public abstract class ProblemSolver {
+public abstract class ProblemSolverMultiThread extends Thread {
 	protected final int dimension;
 	protected int[] solution;
 	protected int[] tmpSolution;
@@ -13,7 +17,7 @@ public abstract class ProblemSolver {
 	protected int[] bestSolution;
 	protected LongMemoryData[] goodSolutions;
 
-	protected final Matrix matrix;
+	protected /*final*/ Matrix matrix;
 
 	protected boolean aspirationCriterion;
 	/**
@@ -34,6 +38,7 @@ public abstract class ProblemSolver {
 	 */
 	protected int tabuIterator;
 	protected int tabuTableSize = 100;
+	protected boolean hasInitiated = false;
 	/**
 	 * Flaga sprawdzająca, czy rozwiązanie zostało zainicjowane
 	 * (używana w algorytmach kOpt i nearestNeighbours).
@@ -104,10 +109,30 @@ public abstract class ProblemSolver {
 	 */
 	protected int[] finalCorrCity;
 
-	public ProblemSolver(Matrix matrix) {
+	protected ProblemSolverMultiThread owner;
+	protected int kValue;
+	protected int bValue;
+	protected LinkedList<Thread> threads;
+	protected ProblemSolverMultiThread bestThread = null;
+
+	public ProblemSolverMultiThread(Matrix matrix) {
 		this.matrix=matrix;
 		this.dimension = matrix.getDimension();
 		solution = new int[dimension];
+		owner = this;
+	}
+
+	public ProblemSolverMultiThread(ProblemSolverMultiThread owner, int k, int b) {
+		permutation = owner.permutation.clone();
+		this.owner = owner;
+		//this.matrix = owner.matrix;
+		this.dimension = owner.dimension;
+		this.permutation = owner.permutation.clone();
+		this.corrCity = owner.corrCity.clone();
+		booleanArray = new boolean[k];
+		kValue = k;
+		bValue = b;
+		start();
 	}
 
 	public void randomPermutation() {
@@ -323,7 +348,7 @@ public abstract class ProblemSolver {
 	public int[] tabuSearch(int k, boolean aspirationCriterion) {
 		this.aspirationCriterion = aspirationCriterion;
 		tabuIterator = 0;
-		long interval = 1000, start = System.currentTimeMillis(), end = start + 60000, time = start + interval;
+		long interval = 1000, start = System.currentTimeMillis(), end = start + 90000, time = start + interval;
 		int[] results = new int[(int) ((end - start) / interval)];
 		if (k < 2) {
 			tabuTable = new int[tabuTableSize][2];
@@ -460,16 +485,16 @@ public abstract class ProblemSolver {
 	}
 
 	protected boolean isAcceptable(int k, int[] permutation, boolean[] booleanArray){
-		int iterator = (isTabuExtended ? tabuTableSize : tabuIterator) - 1;
-		int i = tabuIterator + tabuTableSize - 1;
+		int iterator = (owner.isTabuExtended ? owner.tabuTableSize : owner.tabuIterator) - 1;
+		int i = owner.tabuIterator + owner.tabuTableSize - 1;
 		while (iterator >= 0) {
 			int j;
 			for (j = 0; j < k; j++) {
-				if (tabuTable[i % tabuTableSize][j] != solution[permutation[j]]) {
+				if (owner.tabuTable[i % owner.tabuTableSize][j] != owner.solution[permutation[j]]) {
 					break;
 				}
 			}
-			if (j == k && Arrays.equals(booleanTabuTable[i % tabuTableSize], booleanArray)) {
+			if (j == k && Arrays.equals(owner.booleanTabuTable[i % owner.tabuTableSize], booleanArray)) {
 				return false;
 			}
 			i--;
@@ -505,7 +530,7 @@ public abstract class ProblemSolver {
 					+ matrix.get(solution[(i + 1) % dimension] - 1, solution[(i + 2) % dimension] - 1);
 			helpDistance += matrix.get(solution[(i - 1 + dimension) % dimension] - 1, solution[(i + 1) % dimension] - 1)
 					+ matrix.get(solution[i] - 1, solution[(i + 2) % dimension] - 1);
-			if (this instanceof AsymmetricProblemSolver) {
+			if (this instanceof AsymmetricProblemSolverMultiThread) {
 				helpDistance += matrix.get(solution[(i + 1) % dimension] - 1, solution[i] - 1)
 						- matrix.get(solution[i] - 1, solution[(i + 1) % dimension] - 1);
 			}
@@ -579,7 +604,7 @@ public abstract class ProblemSolver {
 					+ matrix.get(solution[(i + 1) % dimension] - 1, solution[(i + 2) % dimension] - 1);
 			helpDistance += matrix.get(solution[(i - 1 + dimension) % dimension] - 1, solution[(i + 1) % dimension] - 1)
 					+ matrix.get(solution[i] - 1, solution[(i + 2) % dimension] - 1);
-			if (this instanceof AsymmetricProblemSolver) {
+			if (this instanceof AsymmetricProblemSolverMultiThread) {
 				helpDistance += matrix.get(solution[(i + 1) % dimension] - 1, solution[i] - 1)
 						- matrix.get(solution[i] - 1, solution[(i + 1) % dimension] - 1);
 			}
@@ -596,7 +621,7 @@ public abstract class ProblemSolver {
 						+ matrix.get(solution[j % dimension] - 1,solution[(j + 1) % dimension] - 1);
 				helpDistance += matrix.get(solution[(j - 1 + dimension) % dimension] - 1,solution[j % dimension] - 1)
 						+ matrix.get(solution[i] - 1,solution[(j + 1) % dimension] - 1);
-				if (this instanceof AsymmetricProblemSolver) {
+				if (this instanceof AsymmetricProblemSolverMultiThread) {
 					helpDistance += matrix.get(solution[j % dimension] - 1, solution[i] - 1)
 							- matrix.get(solution[i] - 1, solution[j % dimension] - 1);
 				}
@@ -645,7 +670,7 @@ public abstract class ProblemSolver {
 
 	private void kOpt(int k) {
 		firstDistance = distance;
-		if (this instanceof SymmetricProblemSolver) {
+		if (this instanceof SymmetricProblemSolverMultiThread) {
 			booleanArray[0] = false;
 		} else {
 			distances = new int[2][dimension];
@@ -660,7 +685,15 @@ public abstract class ProblemSolver {
 		}
 		int tmpDistance = distance;
 		isInitiated = false;
+		threads = new LinkedList<>();
 		initPermutation(k, 0);
+		for (Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		if (tmpDistance > distance || tabuTable != null) {
 			if (tabuTable != null) {
 				for (int i = 0; i < k; i++) {
@@ -683,18 +716,15 @@ public abstract class ProblemSolver {
 			recreateSolution(k, finalPermutation, finalCorrCity, finalBooleanArray);
 			solution = tmpSolution.clone();
 		}
+		System.out.println(this);
 	}
 
 	private void initPermutation(int k, int l) {
 		if (l == k) {
-			int tmpDistance = distance;
-			boolean tmpIsInitiated = isInitiated;
-			initBooleanArray(k, (this instanceof SymmetricProblemSolver ? 1 : 0), firstDistance);
-			if (tmpIsInitiated != isInitiated || tmpDistance > distance) {
-				firstPermutation = permutation.clone();
-				for (int i = 0; i < k; i++) {
-					finalCorrCity[permutation[i]] = corrCity[permutation[i]];
-				}
+			if (this instanceof SymmetricProblemSolverMultiThread) {
+				threads.add(new SymmetricProblemSolverMultiThread(this, k, 1));
+			} else {
+				threads.add(new AsymmetricProblemSolverMultiThread(this, k, 0));
 			}
 			return;
 		}
@@ -712,12 +742,15 @@ public abstract class ProblemSolver {
 
 	private void initBooleanArray(int k, int l, int distance) {
 		if (l == k) {
-			if ((!isInitiated || distance < this.distance) && (tabuTable == null || aspirationCriterion
-					&& helpDistance < bestDistance || isAcceptable(k, permutation, booleanArray))) {
-				isInitiated = true;
-				this.distance = distance;
-				finalPermutation = permutation.clone();
-				finalBooleanArray = booleanArray.clone();
+			synchronized (this) {
+				if ((!owner.isInitiated || distance < owner.distance) && (owner.tabuTable == null || owner.aspirationCriterion
+						&& helpDistance < owner.bestDistance || isAcceptable(k, permutation, booleanArray))) {
+					owner.isInitiated = true;
+					owner.bestThread = this;
+					owner.distance = distance;
+					owner.finalPermutation = permutation.clone();
+					owner.finalBooleanArray = booleanArray.clone();
+				}
 			}
 			helpDistance = distance;
 			helpPermutation = permutation.clone();
@@ -727,17 +760,17 @@ public abstract class ProblemSolver {
 		}
 		booleanArray[l] = false;
 		initBooleanArray(k, l + 1, distance);
-		int m1 = solution[l > 0 ? (booleanArray[l - 1] ? corrCity[permutation[l - 1]]: permutation[l - 1]) : permutation[k - 1]];
-		int m2 = solution[corrCity[permutation[l]]];
-		int m3 = solution[permutation[l]];
-		int m4 = solution[l < k - 1 ? (permutation[l] + 1) % dimension : (booleanArray[0] ? permutation[0] : corrCity[permutation[0]])];
-		distance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
-		distance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
-		if (this instanceof AsymmetricProblemSolver) {
-			distance += distances[1][corrCity[permutation[l]]] - distances[1][permutation[l]]
-					- distances[0][permutation[l]] + distances[0][corrCity[permutation[l]]];
+		int m1 = owner.solution[l > 0 ? (booleanArray[l - 1] ? corrCity[permutation[l - 1]]: permutation[l - 1]) : permutation[k - 1]];
+		int m2 = owner.solution[corrCity[permutation[l]]];
+		int m3 = owner.solution[permutation[l]];
+		int m4 = owner.solution[l < k - 1 ? (permutation[l] + 1) % dimension : (booleanArray[0] ? permutation[0] : corrCity[permutation[0]])];
+		distance -= owner.matrix.get(m1 - 1, m2 - 1) + owner.matrix.get(m3 - 1, m4 - 1);
+		distance += owner.matrix.get(m1 - 1, m3 - 1) + owner.matrix.get(m2 - 1, m4 - 1);
+		if (this instanceof AsymmetricProblemSolverMultiThread) {
+			distance += owner.distances[1][corrCity[permutation[l]]] - owner.distances[1][permutation[l]]
+					- owner.distances[0][permutation[l]] + owner.distances[0][corrCity[permutation[l]]];
 			if (permutation[l] < corrCity[permutation[l]]) {
-				distance += revFirstDistance - firstDistance;
+				distance += owner.revFirstDistance - owner.firstDistance;
 			}
 		}
 		booleanArray[l] = true;
@@ -754,13 +787,13 @@ public abstract class ProblemSolver {
 			j = permutations(l + 1, isEven, k);
 			isEven = !isEven;
 
-			int m1 = solution[helpBooleanArray[i + j - 1] ? corrCity[helpPermutation[i + j - 1]] : helpPermutation[i + j - 1]];
-			int m2 = solution[helpBooleanArray[i + j] ? helpPermutation[i + j] : corrCity[helpPermutation[i + j]]];
-			int m3 = solution[helpBooleanArray[i + j + 1] ? corrCity[helpPermutation[i + j + 1]] : helpPermutation[i + j + 1]];
-			int m4 = solution[helpBooleanArray[(i + j + 2) % k] ? helpPermutation[(i + j + 2) % k] : corrCity[helpPermutation[(i + j + 2) % k]]];
-			helpDistance -= matrix.get(m1 - 1, m2 - 1) + matrix.get(m3 - 1, m4 - 1);
-			helpDistance += matrix.get(m1 - 1, m3 - 1) + matrix.get(m2 - 1, m4 - 1);
-			if (this instanceof AsymmetricProblemSolver) {
+			int m1 = owner.solution[helpBooleanArray[i + j - 1] ? corrCity[helpPermutation[i + j - 1]] : helpPermutation[i + j - 1]];
+			int m2 = owner.solution[helpBooleanArray[i + j] ? helpPermutation[i + j] : corrCity[helpPermutation[i + j]]];
+			int m3 = owner.solution[helpBooleanArray[i + j + 1] ? corrCity[helpPermutation[i + j + 1]] : helpPermutation[i + j + 1]];
+			int m4 = owner.solution[helpBooleanArray[(i + j + 2) % k] ? helpPermutation[(i + j + 2) % k] : corrCity[helpPermutation[(i + j + 2) % k]]];
+			helpDistance -= owner.matrix.get(m1 - 1, m2 - 1) + owner.matrix.get(m3 - 1, m4 - 1);
+			helpDistance += owner.matrix.get(m1 - 1, m3 - 1) + owner.matrix.get(m2 - 1, m4 - 1);
+			if (this instanceof AsymmetricProblemSolverMultiThread) {
 				int a, b, c, d;
 				if (helpBooleanArray[i + j]) {
 					c = helpPermutation[i + j];
@@ -771,7 +804,7 @@ public abstract class ProblemSolver {
 					c = corrCity[a];
 					d = 0;
 				}
-				helpDistance += distances[1 - d][c] - distances[1 - d][a] - distances[d][a] + distances[d][c];
+				helpDistance += owner.distances[1 - d][c] - owner.distances[1 - d][a] - owner.distances[d][a] + owner.distances[d][c];
 				if (helpBooleanArray[i + j + 1]) {
 					b = helpPermutation[i + j + 1];
 					c = corrCity[b];
@@ -781,9 +814,9 @@ public abstract class ProblemSolver {
 					b = corrCity[c];
 					d = 0;
 				}
-				helpDistance += distances[1 - d][b] - distances[1 - d][c] - distances[d][c] + distances[d][b];
-				helpDistance += matrix.get(solution[b] - 1, solution[a] - 1)
-						- matrix.get(solution[a] - 1, solution[b] - 1);
+				helpDistance += owner.distances[1 - d][b] - owner.distances[1 - d][c] - owner.distances[d][c] + owner.distances[d][b];
+				helpDistance += owner.matrix.get(owner.solution[b] - 1, owner.solution[a] - 1)
+						- owner.matrix.get(owner.solution[a] - 1, owner.solution[b] - 1);
 			}
 
 			int tmp = helpPermutation[i + j];
@@ -793,12 +826,15 @@ public abstract class ProblemSolver {
 			helpBooleanArray[i + j] = !helpBooleanArray[i + j + 1];
 			helpBooleanArray[i + j + 1] = tmpBool;
 
-			if ((!isInitiated || helpDistance < distance) && (tabuTable == null || aspirationCriterion
-					&& helpDistance < bestDistance || isAcceptable(k, helpPermutation, helpBooleanArray))) {
-				isInitiated = true;
-				distance = helpDistance;
-				finalPermutation = helpPermutation.clone();
-				finalBooleanArray = helpBooleanArray.clone();
+			synchronized (this) {
+				if ((!owner.isInitiated || helpDistance < owner.distance) && (owner.tabuTable == null || owner.aspirationCriterion
+						&& helpDistance < owner.bestDistance || isAcceptable(k, helpPermutation, helpBooleanArray))) {
+					owner.isInitiated = true;
+					owner.bestThread = this;
+					owner.distance = helpDistance;
+					owner.finalPermutation = helpPermutation.clone();
+					owner.finalBooleanArray = helpBooleanArray.clone();
+				}
 			}
 		}
 		j = permutations(l + 1, isEven, k);
@@ -811,6 +847,18 @@ public abstract class ProblemSolver {
 
 	public int[] getSolution() {
 		return solution.clone();
+	}
+
+	public void run() {
+		initBooleanArray(kValue, bValue, owner.firstDistance);
+		synchronized (this) {
+			if (owner.bestThread == this) {
+				owner.firstPermutation = permutation.clone();
+				for (int i = 0; i < kValue; i++) {
+					owner.finalCorrCity[permutation[i]] = corrCity[permutation[i]];
+				}
+			}
+		}
 	}
 
 	public void setSolution(int[] solution) {

@@ -1,4 +1,4 @@
-package Structure;
+package ProblemSolver;
 
 public class LongMemoryData {
 

@@ -1,6 +1,6 @@
-import Structure.AsymmetricProblemSolver;
+import ProblemSolver.AsymmetricProblemSolver;
 import Structure.Matrix;
-import Structure.SymmetricProblemSolver;
+import ProblemSolver.SymmetricProblemSolver;
 import org.apache.commons.math3.stat.inference.WilcoxonSignedRankTest;
 import java.io.File;
 import java.io.FileNotFoundException;

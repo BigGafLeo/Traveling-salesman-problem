@@ -1,4 +1,7 @@
-package Structure;
+package ProblemSolver;
+
+import ProblemSolver.ProblemSolverMultiThread;
+import Structure.Matrix;
 
 public class AsymmetricProblemSolverMultiThread extends ProblemSolverMultiThread {
 

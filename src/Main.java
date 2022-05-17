@@ -1,9 +1,7 @@
+import ProblemSolver.ProblemSolver;
 import Structure.*;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Arrays;
 
 public class Main {
 
@@ -74,7 +72,7 @@ public class Main {
             e.printStackTrace();
         }*/
         String name = "berlin52";
-        try {
+        /*try {
             main.structure = FileManager.readFile("data/ALL_tsp/" + name + ".tsp");
             ProblemSolverMultiThread problemSolverMultiThread = new SymmetricProblemSolverMultiThread(main.structure);
             problemSolverMultiThread.randomPermutation();
@@ -92,6 +90,6 @@ public class Main {
             System.out.println(main.problemSolver);
         } catch (FileNotFoundException | WrongFileFormatException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

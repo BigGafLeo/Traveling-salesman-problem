@@ -1,4 +1,6 @@
-package Structure;
+package ProblemSolver;
+
+import Structure.Matrix;
 
 public class SymmetricProblemSolverMultiThread extends ProblemSolverMultiThread {
 

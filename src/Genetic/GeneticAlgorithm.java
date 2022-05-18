@@ -5,10 +5,13 @@ TODO: Ewaluacja populacji  - ocena przydatności do badań
 TODO: Stworzyć połączenia między oddzielnymi wyspami
 TODO: Selekcja - rodzaje (losowa, ruletka (im lepszy osobnik tym większe szanse wybrania go), Turniej - najlepsi z pośród k losowych osobników),
  osobnicy w niektórych selekcjach mogą zostać wybrani więcej niż raz albo mniej
-TODO: Metoda krzyżowania której jednym z argumentów jest wybrany operator krzyżowania zaś drugim prawdopodobieństwo wystąpenia mutacji
-TODO: Stworzyć operatory krzyżowania
-TODO: Stworzyć algorytm mutacyjny (swap, insert, invert, k-opt, NN)
 TODO: *Dołożyć elementy alg. memetycznego
+
+TODO: Mechanizmy łączenia wysp oraz wyznaczania wysp do "mieszanki":
+1. Wyznaczenie odchylenia dla elementów populacji - te z mniejszym będą mieszane (jeżeli jest duża różnica funkcji celu dla populacji to oznacza dużą różnicę genotypów).
+2. Mechanizmy wykrywania stagnacji: odchylenie standardowe wartości funkcji celu, liczba iteracji bez zmian najlepszego fenotypu
+3. Metoda łączenia wysp: zastępujemy wyspy o najgorszym fenotypie mieszanką najgorszy-najlepszy fenotyp / random,
+4. Metoda ochrony elitarnych jednostek.
 */
 
 import java.util.Random;
@@ -18,15 +21,17 @@ import Structure.Matrix;
 
 
 public class GeneticAlgorithm {
-	private double crossingProbability = 0.8;
-
+	private static final double crossingProbability = 0.8;
+	private static final double mutationProbability = 0.08;
+	private static final int mutationLimit = 5;
+	private static final Random random = new Random();
 	private int[] bestPhenotype;
 	private int[][][] genotypes;
 	private int[][] bestGenotype;
 	private int populationSize;
 	private int islandsNumber;
-	private int dimension;
-	private Matrix matrix;
+	private final int dimension;
+	private final Matrix matrix;
 	private ProblemSolver problemSolver;
 
 	public GeneticAlgorithm(Matrix matrix) {
@@ -39,11 +44,17 @@ public class GeneticAlgorithm {
 		this.populationSize = populationSize;
 		this.islandsNumber = populationOptions.length;
 		populationGeneration(populationOptions);
-	}
 
-	private void evaluation(){
 
 	}
+
+	private void evaluate(){
+
+	}
+
+	private void migrate(){}
+
+	private void select(){}
 
 	private void populationGeneration(int [] populationOptions) {
 		genotypes = new int[islandsNumber][populationSize][dimension];
@@ -75,7 +86,7 @@ public class GeneticAlgorithm {
 		}
 	}
 
-	private void randomIslandGeneration(int k){
+	private void randomIslandGeneration(int k) {
 		for (int i = 0; i < populationSize; i++) {
 			problemSolver.randomPermutation();
 			genotypes[k][i] = problemSolver.getSolution();
@@ -113,26 +124,78 @@ public class GeneticAlgorithm {
 		table[j] = temp;
 	}
 
-	private void crossingPermutation(int k) {
-		Random random = new Random();
+	private void cross(CrossingOperators method) {
 
-		for (int pair = 0; pair < populationSize / 2; pair++){
+		for (int k = 0; k < islandsNumber; k++) {
+			for (int pair = 0; pair < populationSize / 2; pair++){
 
-			int i = random.nextInt(populationSize - 2 * pair);
-			swap(genotypes[k], i, populationSize - 2 * pair - 1);
-			int j = random.nextInt(populationSize - 2 * pair - 1);
-			swap(genotypes[k], j, populationSize - 2 * pair - 2);
+				int i = random.nextInt(populationSize - 2 * pair);
+				swap(genotypes[k], i, populationSize - 2 * pair - 1);
+				int j = random.nextInt(populationSize - 2 * pair - 1);
+				swap(genotypes[k], j, populationSize - 2 * pair - 2);
 
-			if (random.nextDouble() <= crossingProbability)
-				crossingPair(k,populationSize - 2 * pair - 1, populationSize - 2 * pair - 2);
+				if (random.nextDouble() <= crossingProbability)
+					crossingPair(k,populationSize - 2 * pair - 1, populationSize - 2 * pair - 2, method);
+			}
+		}
+
+	}
+
+	private void crossingPair(int k, int i, int j, CrossingOperators method) {
+
+		int[] temp;
+		int[][] tempDouble;
+		switch (method) {
+			case OX -> {
+				temp = CrossingMethods.OX(genotypes[k][i], genotypes[k][j]);
+				genotypes[k][j] = CrossingMethods.OX(genotypes[k][j], genotypes[k][i]);
+				genotypes[k][i] = temp;
+			}
+			case CX -> {
+				temp = CrossingMethods.CX(genotypes[k][i], genotypes[k][j]);
+				genotypes[k][j] = CrossingMethods.CX(genotypes[k][j], genotypes[k][i]);
+				genotypes[k][i] = temp;
+			}
+			case CX2 -> {
+				tempDouble = CrossingMethods.CX2(genotypes[k][i], genotypes[k][j]);
+				genotypes[k][j] = tempDouble[0];
+				genotypes[k][i] = tempDouble[1];
+			}
+			default -> { //PMX
+				temp = CrossingMethods.PMX(genotypes[k][i], genotypes[k][j]);
+				genotypes[k][j] = CrossingMethods.PMX(genotypes[k][j], genotypes[k][i]);
+				genotypes[k][i] = temp;
+			}
 		}
 	}
 
-	private void crossingPair(int k, int i, int j) {
-		int[] temp = CrossingOperators.PMX(genotypes[k][i], genotypes[k][j]).clone();
-		genotypes[k][j] = CrossingOperators.PMX(genotypes[k][j], genotypes[k][i]);
-		genotypes[k][i] = temp;
+	private void mutation(MutationMethod method, int i, int j){
+
+		MutationMethod[] methods = {MutationMethod.SWAP, MutationMethod.INSERT, MutationMethod.INVERT};
+
+		if (method == MutationMethod.RANDOM) {
+			method = methods[random.nextInt(3)];
+		}
+
+		problemSolver.setSolution(genotypes[i][j]);
+		for (int iteration = random.nextInt(mutationLimit); iteration >= 0; iteration--)
+			switch (method) {
+				case SWAP -> problemSolver.swap(false);
+				case INSERT -> problemSolver.insert(false);
+				default -> problemSolver.twoOpt(false); //TWOOPT
+			}
+
+		genotypes[i][j] = problemSolver.getSolution();
+
 	}
 
-
+	private void mutate(MutationMethod method) {
+		for (int k = 0; k < islandsNumber; k++) {
+			for (int i = 0; i < populationSize; i++) {
+				if (random.nextDouble() <= mutationProbability) {
+					mutation(method, k, i);
+				}
+			}
+		}
+	}
 }

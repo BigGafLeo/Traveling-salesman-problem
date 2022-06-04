@@ -1,0 +1,5 @@
+package Genetic;
+
+public enum GeneratingPopulationMethod {
+	RANDOM_GENERATION, TWO_OPT_GENERATION, SWAP_GENERATION, INSERT_GENERATION, HYBRID_TWO_OPT_AND_RANDOM
+}

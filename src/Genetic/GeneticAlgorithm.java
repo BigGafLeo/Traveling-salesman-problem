@@ -19,6 +19,9 @@ TODO: Mechanizmy łączenia wysp oraz wyznaczania wysp do "mieszanki":
 
 import java.util.Random;
 
+import Genetic.Enums.CrossingOperators;
+import Genetic.Enums.GeneratingPopulationMethod;
+import Genetic.Enums.MutationMethod;
 import ProblemSolver.*;
 import Structure.Matrix;
 
@@ -99,7 +102,7 @@ public class GeneticAlgorithm {
 				int j = random.nextInt(populationSize - 2 * pair - 1);
 				swap(genotypes[k], j, populationSize - 2 * pair - 2);
 
-				if (random.nextDouble() <= crossingProbability)
+				if (random.nextDouble() <= crossingProbability)		//TODO: Upewnić się że krzyżowane elementy są parami różne
 					crossingPair(k,populationSize - 2 * pair - 1, populationSize - 2 * pair - 2, method);
 			}
 		}

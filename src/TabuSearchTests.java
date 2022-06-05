@@ -153,7 +153,7 @@ public class TabuSearchTests {
 //        String[] files = {"berlin52.tsp", "ch130.tsp", "d493.tsp", "eil101.tsp", "fl1577.tsp","u1432.tsp", "u724.tsp", "ftv33.atsp", "ftv70.atsp", "ftv170.atsp", "rbg323.atsp", "br17.atsp", "ftv55.atsp", "ftv64.atsp", "ry48p.atsp", "kro124p.atsp", "rbg443.atsp"};
         for (String file : files) {
             testTabuSearch(file, 0);
-            //testTabuSearch(file, 1);
+            testTabuSearch(file, 1);
         }
         //compare();
     }

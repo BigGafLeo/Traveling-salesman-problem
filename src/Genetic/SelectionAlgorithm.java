@@ -1,8 +1,22 @@
 package Genetic;
 
-public class SelectionAlgorithm {
-	static public void randomSelection(int[][] candidates, int[][] genotypes) {
 
+import Structure.Matrix;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Random;
+
+public class SelectionAlgorithm {
+
+	static private Matrix matrix;
+
+	static public int[] randomSelection(int size) {
+		int[] candidates = new int[size];
+		Random random = new Random();
+		for (int i = 0; i < size; i++)
+			candidates[i] = random.nextInt(size);
+		return candidates;
 	}
 
 	static public int[] ruletSelection(int[][] genotypes) {
@@ -32,5 +46,9 @@ public class SelectionAlgorithm {
 		int[] candidates = new int[size];
 
 		return candidates;
+	}
+
+	static public void setMatrix(Matrix matrix) {
+		SelectionAlgorithm.matrix = matrix;
 	}
 }

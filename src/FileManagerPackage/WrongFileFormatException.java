@@ -1,3 +1,5 @@
+package FileManagerPackage;
+
 public class WrongFileFormatException extends Exception{
     @Override
     public String toString() {

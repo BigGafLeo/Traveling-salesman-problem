@@ -1,3 +1,5 @@
+package FileManagerPackage;
+
 import Structure.Euklides;
 import Structure.Matrix;
 

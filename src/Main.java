@@ -46,7 +46,7 @@ public class Main {
         /*PrintStream ps;
         try {
             String name = "ch130";
-            main.structure = FileManager.readFile("data/ALL_tsp/" + name + ".tsp");
+            main.structure = FileManagerPackage.FileManager.readFile("data/ALL_tsp/" + name + ".tsp");
             main.problemSolver = new SymmetricProblemSolver(main.structure);
             main.problemSolver.randomPermutation();
             main.problemSolver.nearestNeighbour();
@@ -68,12 +68,12 @@ public class Main {
             main.problemSolver.tabuSearch(2, true);
             main.problemSolver.setSolution(initialSolution);
             main.problemSolver.kOpt(2, true);
-        } catch (FileNotFoundException | WrongFileFormatException e) {
+        } catch (FileNotFoundException | FileManagerPackage.WrongFileFormatException e) {
             e.printStackTrace();
         }*/
         String name = "berlin52";
         /*try {
-            main.structure = FileManager.readFile("data/ALL_tsp/" + name + ".tsp");
+            main.structure = FileManagerPackage.FileManager.readFile("data/ALL_tsp/" + name + ".tsp");
             ProblemSolverMultiThread problemSolverMultiThread = new SymmetricProblemSolverMultiThread(main.structure);
             problemSolverMultiThread.randomPermutation();
             int[] initialSolution = problemSolverMultiThread.getSolution();
@@ -88,7 +88,7 @@ public class Main {
             main.problemSolver.kOpt(3, true);
             System.out.println(System.currentTimeMillis() - start);
             System.out.println(main.problemSolver);
-        } catch (FileNotFoundException | WrongFileFormatException e) {
+        } catch (FileNotFoundException | FileManagerPackage.WrongFileFormatException e) {
             e.printStackTrace();
         }*/
     }

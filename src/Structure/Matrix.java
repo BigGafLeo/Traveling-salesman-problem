@@ -1,5 +1,6 @@
 package Structure;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class Matrix {
@@ -63,5 +64,14 @@ public class Matrix {
 
 	public int getDimension() {
 		return dimension;
+	}
+
+	@Override
+	public String toString() {
+		String s = "";
+		for (int i = 0; i < dimension; i++) {
+			s += Arrays.toString(matrix[i]) + "\n";
+		}
+		return s;
 	}
 }

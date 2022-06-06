@@ -1,3 +1,5 @@
+import FileManagerPackage.FileManager;
+import FileManagerPackage.WrongFileFormatException;
 import ProblemSolver.AsymmetricProblemSolver;
 import Structure.Matrix;
 import ProblemSolver.ProblemSolver;
@@ -81,7 +83,7 @@ public class TabuSearchTests {
 //        System.out.println("\nAsymmetric problem:");
 //        for (int i = 0 ; i < atsp_distance[1].length; i++) {
 //            try {
-//                matrix = FileManager.readFile("data/ALL_atsp/" + atsp_files[i]);
+//                matrix = FileManagerPackage.FileManager.readFile("data/ALL_atsp/" + atsp_files[i]);
 //                asymmetricProblemSolver = new AsymmetricProblemSolver(matrix);
 //                asymmetricProblemSolver.tabuSearch(0, true);
 //                atsp_distance[0][i] = asymmetricProblemSolver.getDistance();
@@ -92,14 +94,14 @@ public class TabuSearchTests {
 //                asymmetricProblemSolver.tabuSearch(3, true);
 //                atsp_distance[3][i] = asymmetricProblemSolver.getDistance();
 //                System.out.println(atsp_distance[0][i] + " " + atsp_distance[1][i] + " " + atsp_distance[2][i] + " " + atsp_distance[3][i]);
-//            } catch (FileNotFoundException | WrongFileFormatException e) {
+//            } catch (FileNotFoundException | FileManagerPackage.WrongFileFormatException e) {
 //                e.printStackTrace();
 //            }
 //        }
 //        System.out.println("\nSymmetric problem:");
 //        for (int i = 0 ; i < tsp_distance[1].length; i++) {
 //            try {
-//                matrix = FileManager.readFile("data/ALL_tsp/" + tsp_files[i]);
+//                matrix = FileManagerPackage.FileManager.readFile("data/ALL_tsp/" + tsp_files[i]);
 //                symmetricProblemSolver = new SymmetricProblemSolver(matrix);
 //                symmetricProblemSolver.tabuSearch(0, true);
 //                tsp_distance[0][i] = symmetricProblemSolver.getDistance();
@@ -110,7 +112,7 @@ public class TabuSearchTests {
 //                symmetricProblemSolver.tabuSearch(3, true);
 //                tsp_distance[3][i] = symmetricProblemSolver.getDistance();
 //                System.out.println(tsp_distance[0][i] + " " + tsp_distance[1][i] + " " + tsp_distance[2][i] + " " + tsp_distance[3][i]);
-//            } catch (FileNotFoundException | WrongFileFormatException e) {
+//            } catch (FileNotFoundException | FileManagerPackage.WrongFileFormatException e) {
 //                e.printStackTrace();
 //            }
 //        }

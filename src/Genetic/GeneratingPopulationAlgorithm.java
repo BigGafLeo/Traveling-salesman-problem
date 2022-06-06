@@ -8,6 +8,8 @@ public class GeneratingPopulationAlgorithm {
 	private static int populationSize;
 	private static Genotype[][] genotypes;
 	private static ProblemSolver problemSolver;
+	private static int localSearchIterationsNumber;
+	private static Matrix matrix;
 
 	public static void randomIslandGeneration(int k) {
 		for (int i = 0; i < populationSize * 2 ; i++) {
@@ -60,7 +62,7 @@ public class GeneratingPopulationAlgorithm {
 		}
 	}
 
-	public static void setParameters(int[][][] genotypes, int populationSize, ProblemSolver problemSolver) {
+	public static void setParameters(Genotype[][] genotypes, int populationSize, ProblemSolver problemSolver, Matrix matrix) {
 		GeneratingPopulationAlgorithm.genotypes = genotypes;
 		GeneratingPopulationAlgorithm.populationSize = populationSize;
 		GeneratingPopulationAlgorithm.problemSolver = problemSolver;

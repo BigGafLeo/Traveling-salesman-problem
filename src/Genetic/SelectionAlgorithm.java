@@ -23,8 +23,7 @@ public class SelectionAlgorithm {
 		return candidates;
 	}
 
-	static public int[] ruletSelection(int[][] genotypes) {
-		int size = genotypes[0].length;
+	static public int[] rouletteSelection(Genotype[] genotypes, int size) {
 		int[] candidates = new int[size];
 		Random random = new Random();
 

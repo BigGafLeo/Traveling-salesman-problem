@@ -3,11 +3,8 @@ package Genetic;
 /*
 TODO: Ewaluacja populacji  - ocena przydatności do badań
 TODO: Stworzyć połączenia między oddzielnymi wyspami
-TODO: Selekcja - rodzaje (losowa, ruletka (im lepszy osobnik tym większe szanse wybrania go), Turniej - najlepsi z pośród k losowych osobników),
- osobnicy w niektórych selekcjach mogą zostać wybrani więcej niż raz albo mniej
-TODO: *Dołożyć elementy alg. memetycznego
-TODO: dodatkowe mechanizmy śmierci jednostek + ochrona elity
 TODO: Delay mutacyjny dla świeżo zmutowanych jednostek
+TODO: *Dołożyć elementy alg. memetycznego
 
 TODO: Mechanizmy łączenia wysp oraz wyznaczania wysp do "mieszanki":
 1. Wyznaczenie odchylenia dla elementów populacji - te z mniejszym będą mieszane (jeżeli jest duża różnica funkcji celu dla populacji to oznacza dużą różnicę genotypów).
@@ -17,11 +14,13 @@ TODO: Mechanizmy łączenia wysp oraz wyznaczania wysp do "mieszanki":
 .
 */
 
+import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Random;
 
-import Genetic.Enums.CrossingOperators;
-import Genetic.Enums.GeneratingPopulationMethod;
-import Genetic.Enums.MutationMethod;
+import FileManagerPackage.FileManager;
+import FileManagerPackage.WrongFileFormatException;
+import Genetic.Enums.*;
 import ProblemSolver.*;
 import Structure.Matrix;
 
@@ -33,18 +32,22 @@ public class GeneticAlgorithm {
 	private static final int connectionDelay = 30;
 	private static final long time = 60000;
 	private static final Random random = new Random();
-	private int[] bestPhenotypeOfIsland;
-	private int[][][] genotypes;
-	private int[][] bestGenotypeOfIsland;
+	private Genotype[][] genotypes;
+	private Genotype[] bestGenotypeOfIsland;
+	private int [][] candidates;
+	private int [] numbersOfChildren;
 	private int populationSize;
 	private int islandsNumber;
 	private final int dimension;
 	private final Matrix matrix;
 	private final ProblemSolver problemSolver;
 
-	public GeneticAlgorithm(Matrix matrix) {
+	public GeneticAlgorithm(Matrix matrix, int populationSize, int islandsNumber) {
 		this.matrix = matrix;
 		this.dimension = matrix.getDimension();
+		this.populationSize = populationSize;
+		this.islandsNumber = islandsNumber;
+		numbersOfChildren = new int[islandsNumber];
 		problemSolver = matrix.isSymmetric() ? new SymmetricProblemSolver(matrix) : new AsymmetricProblemSolver(matrix);
 	}
 
@@ -116,23 +119,28 @@ public class GeneticAlgorithm {
 
 	private void migrate(){}
 
-	private void setBestGenotypeOfIsland(){
+	private void select(SelectionMethod selectionMethod){
+		for (int k = 0; k < islandsNumber; k++) {
+			switch (selectionMethod){
+				case RULET_SELECTION -> candidates[k] = SelectionAlgorithm.rouletteSelection(genotypes[k], populationSize);
+				case TOURNAMENT_SELECTION -> candidates[k] = SelectionAlgorithm.tournamentSelection(genotypes[k], populationSize);
+				default -> candidates[k] = SelectionAlgorithm.randomSelection(populationSize);
+			}
+		}
 
 	}
 
-	private void setBestPhenotypeOfIsland(){}
-
-	private int[] bestOfAllPopulations(){return null;}
-
-	private void select(){}
-
-	private void populationGeneration(GeneratingPopulationMethod[] populationOptions) {
-		genotypes = new int[islandsNumber][populationSize][dimension];
-		bestGenotypeOfIsland = new int[islandsNumber][dimension];
-		bestPhenotypeOfIsland  = new int[islandsNumber];
-
+	private void populationGeneration(GeneratingPopulationMethod populationOption) {
+		candidates = new int[islandsNumber][populationSize];
+		genotypes = new Genotype[islandsNumber][2 * populationSize];
+		bestGenotypeOfIsland = new Genotype[islandsNumber];
+		for (int k = 0; k < islandsNumber; k++) {
+			bestGenotypeOfIsland[k] = new Genotype(matrix);
+			bestGenotypeOfIsland[k].phenotype = Integer.MAX_VALUE;
+		}
+		GeneratingPopulationAlgorithm.setParameters(genotypes, populationSize, problemSolver, matrix);
 		for (int i = 0; i < islandsNumber; i++) {
-			switch (populationOptions[i]) {
+			switch (populationOption) {
 				case HYBRID_TWO_OPT_AND_RANDOM -> GeneratingPopulationAlgorithm.hybridIslandGeneration(i);
 				case TWO_OPT_GENERATION -> GeneratingPopulationAlgorithm.twoOptIslandGeneration(i);
 				case SWAP_GENERATION -> GeneratingPopulationAlgorithm.swapIslandGeneration(i);
@@ -189,59 +197,65 @@ public class GeneticAlgorithm {
 		}
 	}
 
-
-	static public void swap(int [][]table, int i, int j){
-		int[] temp = table[i];
-		table [i] = table[j];
-		table[j] = temp;
+	static public void swap(Genotype[] array, int i, int j){
+		Genotype temp = array[i];
+		array [i] = array[j];
+		array[j] = temp;
 	}
 
-	private void cross(CrossingOperators method) {
+	static public void swap(int[] array, int i, int j) {
+		int temp = array[i];
+		array [i] = array[j];
+		array[j] = temp;
+	}
 
+	private void cross(CrossingMethod method) {
 		for (int k = 0; k < islandsNumber; k++) {
-			for (int pair = 0; pair < populationSize / 2; pair++){
-
+			numbersOfChildren[k] = 0;
+			for (int pair = 0; pair < populationSize / 2; pair++) {
 				int i = random.nextInt(populationSize - 2 * pair);
-				swap(genotypes[k], i, populationSize - 2 * pair - 1);
+				swap(candidates[k], i, populationSize - 2 * pair - 1);
 				int j = random.nextInt(populationSize - 2 * pair - 1);
-				swap(genotypes[k], j, populationSize - 2 * pair - 2);
-
-				if (random.nextDouble() <= crossingProbability)		//TODO: Upewnić się że krzyżowane elementy są parami różne
-					crossingPair(k,populationSize - 2 * pair - 1, populationSize - 2 * pair - 2, method);
+				swap(candidates[k], j, populationSize - 2 * pair - 2);
+				i = candidates[k][populationSize - 2 * pair - 1];
+				j = candidates[k][populationSize - 2 * pair - 2];
+				if (random.nextDouble() <= crossingProbability && i != j) {
+					crossingPair(k, i, j, method, pair);
+					numbersOfChildren[k]++;
+				}
 			}
 		}
-
 	}
 
-	private void crossingPair(int k, int i, int j, CrossingOperators method) {
+	private void crossingPair(int k, int i, int j, CrossingMethod method, int pair) {
 
 		int[] temp;
 		int[][] tempDouble;
 		switch (method) {
 			case OX -> {
-				temp = CrossingMethods.OX(genotypes[k][i], genotypes[k][j]);
-				genotypes[k][j] = CrossingMethods.OX(genotypes[k][j], genotypes[k][i]);
-				genotypes[k][i] = temp;
+				temp = CrossingAlgorithms.OX(genotypes[k][i].genotype, genotypes[k][j].genotype);
+				genotypes[k][2 * pair + populationSize].setGenotype(CrossingAlgorithms.OX(genotypes[k][j].genotype, genotypes[k][i].genotype));
+				genotypes[k][2 * pair + 1 + populationSize].setGenotype(temp);
 			}
 			case CX -> {
-				temp = CrossingMethods.CX(genotypes[k][i], genotypes[k][j]);
-				genotypes[k][j] = CrossingMethods.CX(genotypes[k][j], genotypes[k][i]);
-				genotypes[k][i] = temp;
+				temp = CrossingAlgorithms.CX(genotypes[k][i].genotype, genotypes[k][j].genotype);
+				genotypes[k][2 * pair + populationSize].setGenotype(CrossingAlgorithms.CX(genotypes[k][j].genotype, genotypes[k][i].genotype));
+				genotypes[k][2 * pair + 1 + populationSize].setGenotype(temp);
 			}
 			case CX2 -> {
-				tempDouble = CrossingMethods.CX2(genotypes[k][i], genotypes[k][j]);
-				genotypes[k][j] = tempDouble[0];
-				genotypes[k][i] = tempDouble[1];
+				tempDouble = CrossingAlgorithms.CX2(genotypes[k][i].genotype, genotypes[k][j].genotype);
+				genotypes[k][2 * pair + populationSize].setGenotype(tempDouble[0]);
+				genotypes[k][2 * pair + 1 + populationSize].setGenotype(tempDouble[1]);
 			}
 			default -> { //PMX
-				temp = CrossingMethods.PMX(genotypes[k][i], genotypes[k][j]);
-				genotypes[k][j] = CrossingMethods.PMX(genotypes[k][j], genotypes[k][i]);
-				genotypes[k][i] = temp;
+				temp = CrossingAlgorithms.PMX(genotypes[k][i].genotype, genotypes[k][j].genotype);
+				genotypes[k][2 * pair + populationSize].genotype = CrossingAlgorithms.PMX(genotypes[k][j].genotype, genotypes[k][i].genotype);
+				genotypes[k][2 * pair + 1 + populationSize].setGenotype(temp);
 			}
 		}
 	}
 
-	private void mutation(MutationMethod method, int i, int j){
+	private void mutation(MutationMethod method, int k, int i){
 
 		MutationMethod[] methods = {MutationMethod.SWAP, MutationMethod.INSERT, MutationMethod.INVERT};
 
@@ -249,12 +263,12 @@ public class GeneticAlgorithm {
 			method = methods[random.nextInt(3)];
 		}
 
-		problemSolver.setSolution(genotypes[i][j]);
+		problemSolver.setSolution(genotypes[k][i].genotype);
 		for (int iteration = random.nextInt(mutationLimit); iteration >= 0; iteration--)
 			switch (method) {
 				case SWAP -> problemSolver.swap(false);
 				case INSERT -> problemSolver.insert(false);
-				case NEAREST_NEIGHBOUR -> MutationAlgorithm.nearestNeighbourMutationAlgorithm(genotypes[i][j], matrix);
+				case NEAREST_NEIGHBOUR -> MutationAlgorithm.nearestNeighbourMutationAlgorithm(genotypes[k][i].genotype, matrix);
 				default -> problemSolver.twoOpt(false);
 			}
 
@@ -264,14 +278,23 @@ public class GeneticAlgorithm {
 
 	private void mutate(MutationMethod method) {
 		for (int k = 0; k < islandsNumber; k++) {
-			for (int i = 0; i < populationSize; i++) {
+			for (int i = 0; i < populationSize + numbersOfChildren[k]; i++) {
 				if (random.nextDouble() <= mutationProbability) {
 					mutation(method, k, i);
 				}
 			}
 		}
 	}
-}
+
+	private void deathZone(LifeIsBrutalMethod method) {
+		for (int i = 0; i < islandsNumber; i++){
+			if (method == LifeIsBrutalMethod.AGE_ELIMINATING) {
+				LifeIsBrutalAlgorithm.ageEliminating(genotypes[i], populationSize + numbersOfChildren[i]);
+			} else {
+				LifeIsBrutalAlgorithm.randomEliminating(genotypes[i], populationSize + numbersOfChildren[i]);
+			}
+		}
+	}
 
 	public static void main(String[] args) {
 		try {

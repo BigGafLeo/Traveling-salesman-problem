@@ -1,26 +1,30 @@
 package Genetic;
 
 import ProblemSolver.ProblemSolver;
+import Structure.Matrix;
 
 public class GeneratingPopulationAlgorithm {
 
 	private static int populationSize;
-	private static int[][][] genotypes;
+	private static Genotype[][] genotypes;
 	private static ProblemSolver problemSolver;
 
 	public static void randomIslandGeneration(int k) {
-		for (int i = 0; i < populationSize; i++) {
+		for (int i = 0; i < populationSize * 2 ; i++) {
 			problemSolver.randomPermutation();
-			genotypes[k][i] = problemSolver.getSolution();
+			genotypes[k][i] = new Genotype(matrix);
+			genotypes[k][i].setGenotype(problemSolver.getSolution());
 		}
 	}
 
 	public static void twoOptIslandGeneration(int k){
 		randomIslandGeneration(k);
 		for (int i = 0; i < populationSize; i++) {
-			problemSolver.setSolution(genotypes[k][i]);
-			problemSolver.twoOpt(true);
-			genotypes[k][i] = problemSolver.getSolution();
+			problemSolver.setSolution(genotypes[k][i].genotype);
+			for (int j = 0; j < localSearchIterationsNumber; j++) {
+				problemSolver.twoOpt(false);
+			}
+			genotypes[k][i].setGenotype(problemSolver.getSolution());
 		}
 
 	}
@@ -28,27 +32,31 @@ public class GeneratingPopulationAlgorithm {
 	public static void swapIslandGeneration(int k) {
 		randomIslandGeneration(k);
 		for (int i = 0; i < populationSize; i++) {
-			problemSolver.setSolution(genotypes[k][i]);
-			problemSolver.swap(true);
-			genotypes[k][i] = problemSolver.getSolution();
+			problemSolver.setSolution(genotypes[k][i].genotype);
+			for (int j = 0; j < localSearchIterationsNumber; j++) {
+				problemSolver.swap(false);
+			}
+			genotypes[k][i].setGenotype(problemSolver.getSolution());
 		}
 	}
 
 	public static void insertIslandGeneration(int k){
 		randomIslandGeneration(k);
 		for (int i = 0; i < populationSize; i++) {
-			problemSolver.setSolution(genotypes[k][i]);
-			problemSolver.insert(true);
-			genotypes[k][i] = problemSolver.getSolution();
+			problemSolver.setSolution(genotypes[k][i].genotype);
+			for (int j = 0; j < localSearchIterationsNumber; j++) {
+				problemSolver.insert(false);
+			}
+			genotypes[k][i].setGenotype(problemSolver.getSolution());
 		}
 	}
 
 	public static void hybridIslandGeneration(int k) {
 		randomIslandGeneration(k);
 		for (int i = 0; i < populationSize / 5; i++) {
-			problemSolver.setSolution(genotypes[k][i]);
+			problemSolver.setSolution(genotypes[k][i].genotype);
 			problemSolver.twoOpt(true);
-			genotypes[k][i] = problemSolver.getSolution();
+			genotypes[k][i].setGenotype(problemSolver.getSolution());
 		}
 	}
 
@@ -56,5 +64,7 @@ public class GeneratingPopulationAlgorithm {
 		GeneratingPopulationAlgorithm.genotypes = genotypes;
 		GeneratingPopulationAlgorithm.populationSize = populationSize;
 		GeneratingPopulationAlgorithm.problemSolver = problemSolver;
+		GeneratingPopulationAlgorithm.matrix = matrix;
+		GeneratingPopulationAlgorithm.localSearchIterationsNumber = matrix.getDimension() / 5;
 	}
 }

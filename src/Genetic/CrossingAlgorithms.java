@@ -3,7 +3,7 @@ package Genetic;
 import java.util.Arrays;
 import java.util.Random;
 
-public class CrossingMethods {
+public class CrossingAlgorithms {
 
 	private static int [] randomCuts(int dimension){
 		int [] cutPoints = new int[2];

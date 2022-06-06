@@ -1,5 +1,5 @@
 package Genetic.Enums;
 
-public enum CrossingOperators {
+public enum CrossingMethod {
 	OX, CX, CX2, PMX
 }

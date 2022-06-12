@@ -1,6 +1,7 @@
 package Genetic.Test;
 
 import Genetic.CrossingAlgorithms;
+import Structure.Matrix;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -44,5 +45,24 @@ class CrossingMethodsTest {
 		System.out.println(Arrays.toString(result[0]));
 		System.out.println(Arrays.toString(generated[0])+ "\n" +Arrays.toString(generated[1]));
 		assertArrayEquals(result, CrossingAlgorithms.CX2(firstParent, secondParent));
+	}
+
+	@Test
+	public void nearestNeighbourCrossTest() {
+		int[][] tMatrix = {
+				{0, 5, 2, 4, 1},
+				{5, 0, 3, 1, 1},
+				{2, 3, 0, 4, 2},
+				{4, 1, 4, 0, 5},
+				{1, 1, 2, 5, 0}
+		};
+		Matrix matrix = new Matrix(5,tMatrix,true);
+		int [] firstParent = {1,2,3,4,5};
+		int [] secondParent = {2,5,4,1,3};
+		int [] iWant = {1,5,2,3,4};
+		int [] result = CrossingAlgorithms.nearestNeighbourCross(firstParent, secondParent, matrix, 0);
+		System.out.println(Arrays.toString(iWant));
+		System.out.println(Arrays.toString(result));
+		assertArrayEquals(iWant,result);
 	}
 }

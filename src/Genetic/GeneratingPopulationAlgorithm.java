@@ -57,7 +57,9 @@ public class GeneratingPopulationAlgorithm {
 		randomIslandGeneration(k);
 		for (int i = 0; i < populationSize / 5; i++) {
 			problemSolver.setSolution(genotypes[k][i].genotype);
-			problemSolver.twoOpt(true);
+			for (int j = 0; j < localSearchIterationsNumber; j++) {
+				problemSolver.twoOpt(false);
+			}
 			genotypes[k][i].setGenotype(problemSolver.getSolution());
 		}
 	}

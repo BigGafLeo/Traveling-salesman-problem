@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class MutationAlgorithm {
 
-	private static final double nearestNeighbourPercentage = 0.1;
+	private static final double nearestNeighbourPercentage = 0.5;
 
 	private static void swap(int[] genotype, int firstIndex, int secondIndex) {
 		int tmp = genotype[firstIndex];
@@ -33,4 +33,12 @@ public class MutationAlgorithm {
 	}
 
 
+	public static void randomSwaps(int[] genotype) {
+		Random random = new Random();
+		for (int i = 0; i < genotype.length / 10; i++) {
+			int a = random.nextInt(genotype.length);
+			int b = random.nextInt(genotype.length);
+			swap(genotype, a, b);
+		}
+	}
 }

@@ -1,5 +1,7 @@
 package Genetic;
 
+import Structure.Matrix;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -114,5 +116,84 @@ public class CrossingAlgorithms {
 		} while (j < dimension);
 
 		return children;
+	}
+
+	public static int[][] nearestNeighbourCross(int[] firstParent, int[] secondParent, Matrix matrix) {
+		Random random = new Random();
+		int i = random.nextInt(matrix.getDimension());
+		int j = random.nextInt(matrix.getDimension() - 1);
+		if (j >= i)
+			j++;
+		int [][] children = new int [2][];
+		children[0] = nearestNeighbourCross(firstParent, secondParent, matrix, i);
+		children[1] = nearestNeighbourCross(secondParent, firstParent, matrix, j);
+		return children;
+	}
+
+	public static int[] nearestNeighbourCross(int[] firstParent, int[] secondParent, Matrix matrix, int index) {
+		int dimension = matrix.getDimension();
+		int [] child = new int [dimension];
+		int [][] help = new int [2][dimension];
+		int firstOrSecond = 0; // 0 - first, 1 - second
+		boolean[] alreadyUsed = new boolean[dimension];
+
+		for (int i = 0; i < dimension; i++) {
+			help[0][firstParent[i] - 1] = i;
+			help[1][secondParent[i] - 1] = i;
+		}
+
+		for (int i = 0; i < dimension - 1; i++) {
+			child[i] = (firstOrSecond == 0 ? firstParent[index] : secondParent[index]);
+			int secondIndex = help[1 - firstOrSecond][child[i] - 1];
+			if (firstOrSecond == 1) {
+				int tmp = index;
+				index = secondIndex;
+				secondIndex = tmp;
+			}
+			alreadyUsed[child[i] - 1] = true;
+			int minDistance = Integer.MAX_VALUE;
+			int actDistance;
+			int tmpIndex = 0;
+
+			int city = firstParent[(index - 1 + dimension) % dimension];
+			if (!alreadyUsed[city - 1] && (actDistance = matrix.get(city - 1, firstParent[index] - 1)) < minDistance) {
+				firstOrSecond = 0;
+				minDistance = actDistance;
+				tmpIndex = (index - 1 + dimension) % dimension;
+			}
+			city = firstParent[(index + 1) % dimension];
+			if (!alreadyUsed[city - 1] && (actDistance = matrix.get(city - 1, firstParent[index] - 1)) < minDistance) {
+				firstOrSecond = 0;
+				minDistance = actDistance;
+				tmpIndex = (index + 1) % dimension;
+			}
+			city = secondParent[(secondIndex - 1 + dimension) % dimension];
+			if (!alreadyUsed[city - 1] && (actDistance = matrix.get(city - 1, secondParent[secondIndex] - 1)) < minDistance) {
+				firstOrSecond = 1;
+				minDistance = actDistance;
+				tmpIndex = (secondIndex - 1 + dimension) % dimension;
+			}
+			city = secondParent[(secondIndex + 1) % dimension];
+			if (!alreadyUsed[city - 1] && (actDistance = matrix.get(city - 1, secondParent[secondIndex] - 1)) < minDistance) {
+				firstOrSecond = 1;
+				minDistance = actDistance;
+				tmpIndex = (secondIndex + 1) % dimension;
+			}
+
+			if (minDistance == Integer.MAX_VALUE) {
+
+				firstOrSecond = 0;
+				for (int j = 0; j < dimension; j++) {
+					city = firstParent[j];
+					if (!alreadyUsed[city - 1] && (actDistance = matrix.get(city - 1, firstParent[index] - 1)) < minDistance) {
+						minDistance = actDistance;
+						tmpIndex = j;
+					}
+				}
+			}
+			index = tmpIndex;
+		}
+		child[dimension - 1] = (firstOrSecond == 0 ? firstParent[index] : secondParent[index]);
+		return child;
 	}
 }

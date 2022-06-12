@@ -18,7 +18,7 @@ public class LifeIsBrutalAlgorithm {
 		Arrays.sort(genotypes, 0, numberOfGenotypes, Comparator.comparingInt(o -> o.phenotype));
 	}
 
-	public static void randomEliminating(Genotype[] genotypes, int numberOfGenotypes){
+	public static void eliteProtection(Genotype[] genotypes, int numberOfGenotypes){
 
 		int chosenOne;
 		int sizeOfElite = (int)(numberOfGenotypes * percentOfElite) + 1;
@@ -26,8 +26,16 @@ public class LifeIsBrutalAlgorithm {
 		elite(genotypes, numberOfGenotypes);
 
 		for (int i = sizeOfElite; i < numberOfGenotypes; i++){
-			chosenOne = random.nextInt(numberOfGenotypes - sizeOfElite) + sizeOfElite;
+			chosenOne = random.nextInt(numberOfGenotypes - i) + sizeOfElite;
 			swap(genotypes, chosenOne,numberOfGenotypes - 1 - i + sizeOfElite);
+		}
+	}
+
+	public static void randomEliminating(Genotype[] genotypes, int numberOfGenotypes){
+		int chosenOne;
+		for (int i = 0; i < numberOfGenotypes - 1; i++){
+			chosenOne = random.nextInt(numberOfGenotypes - i);
+			swap(genotypes, chosenOne, numberOfGenotypes - 1 - i);
 		}
 	}
 
@@ -44,5 +52,16 @@ public class LifeIsBrutalAlgorithm {
 			int index = BinarySearch.binarySearch(sumsOfAges, value, 0, i - sizeOfElite);
 			swap(genotypes, index + sizeOfElite, i);
 		}
+		/*int populationSize = genotypes.length / 2;
+		double[] sumsOfAges = new double [numberOfGenotypes];
+		sumsOfAges[0] = genotypes[0].age;
+		for (int i = 1; i < numberOfGenotypes; i++) {
+			sumsOfAges[i] = sumsOfAges[i - 1] + genotypes[i].age;
+		}
+		for (int i = numberOfGenotypes - 1; i >= populationSize; i--) {
+			double value = random.nextDouble() * sumsOfAges[numberOfGenotypes - 1];
+			int index = BinarySearch.binarySearch(sumsOfAges, value, 0, i);
+			swap(genotypes, index, i);
+		}*/
 	}
 }

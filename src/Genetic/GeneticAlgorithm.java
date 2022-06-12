@@ -15,7 +15,8 @@ TODO: Mechanizmy łączenia wysp oraz wyznaczania wysp do "mieszanki":
 */
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.Random;
 
 import FileManagerPackage.FileManager;
@@ -28,23 +29,22 @@ import Structure.Matrix;
 public class GeneticAlgorithm {
 	private static final double crossingProbability = 0.8;
 	private static final double mutationProbability = 0.01;
-	private static final int mutationLimit = 1;
-	private static final int connectionDelay = 30;
+	private static final int mutationLimit = 2;
+	private static final int connectionDelay = 60;
 	private static final long time = 60000;
+	private static final long interval = 1000;
 	private static final Random random = new Random();
 	private Genotype[][] genotypes;
 	private Genotype[] bestGenotypeOfIsland;
 	private int [][] candidates;
-	private int [] numbersOfChildren;
-	private int populationSize;
-	private int islandsNumber;
-	private final int dimension;
+	private final int [] numbersOfChildren;
+	private final int populationSize;
+	private final int islandsNumber;
 	private final Matrix matrix;
 	private final ProblemSolver problemSolver;
 
 	public GeneticAlgorithm(Matrix matrix, int populationSize, int islandsNumber) {
 		this.matrix = matrix;
-		this.dimension = matrix.getDimension();
 		this.populationSize = populationSize;
 		this.islandsNumber = islandsNumber;
 		numbersOfChildren = new int[islandsNumber];
@@ -53,42 +53,32 @@ public class GeneticAlgorithm {
 
 	public void start(GeneratingPopulationMethod populationOption, SelectionMethod selectionMethod,
 					  CrossingMethod crossingMethod, MutationMethod mutationMethod, LifeIsBrutalMethod lifeIsBrutalMethod) {
-
+		//System.out.println("Czas w sekundach;Wartość funkcji celu");
 		populationGeneration(populationOption);
-		System.out.println(Arrays.toString(bestGenotypeOfIsland));
+		//System.out.println(0 + ";" + findBestOfAll().phenotype);
 		long startTime = System.currentTimeMillis();
+		long prev = startTime;
 		SelectionAlgorithm.setMatrix(matrix);
 		int iterationCounter = 0;
 		while (System.currentTimeMillis() <= startTime + time) {
 			allMakeOlder();
 			long t = System.currentTimeMillis();
 			select(selectionMethod);
-			System.out.print("Select: " + (System.currentTimeMillis() - t));
-			t = System.currentTimeMillis();
 			cross(crossingMethod);
-			System.out.print(" Cross: " + (System.currentTimeMillis() - t));
-			t = System.currentTimeMillis();
 			mutate(mutationMethod);
-			System.out.print(" Mutate: " + (System.currentTimeMillis() - t));
-			t = System.currentTimeMillis();
 			deathZone(lifeIsBrutalMethod);
-			System.out.print(" Deatch: " + (System.currentTimeMillis() - t));
 
-			t = System.currentTimeMillis();
-			findBest();
-			System.out.println(" " + Arrays.toString(bestGenotypeOfIsland));
 			if (iterationCounter++ == connectionDelay) {
 				bridge();
 				iterationCounter = 0;
 			}
-		}
-		int min = bestGenotypeOfIsland[0].phenotype;
-		for (int k = 1; k < islandsNumber; k++) {
-			if (bestGenotypeOfIsland[k].phenotype < min) {
-				min = bestGenotypeOfIsland[k].phenotype;
+			findBest();
+			if (System.currentTimeMillis() - prev >= interval) {
+				//System.out.println((System.currentTimeMillis() - startTime) / interval + ";" + findBestOfAll().phenotype);
+				prev = System.currentTimeMillis();
 			}
 		}
-		System.out.println(min);
+		//System.out.println((System.currentTimeMillis() - startTime) / interval + ";" + findBestOfAll().phenotype);
 	}
 
 	private void allMakeOlder(){
@@ -113,16 +103,20 @@ public class GeneticAlgorithm {
 		}
 	}
 
-	private void evaluate(){
-
+	public Genotype findBestOfAll() {
+		Genotype best = bestGenotypeOfIsland[0];
+		for (int i = 1; i < islandsNumber; i++) {
+			if (bestGenotypeOfIsland[i].phenotype < best.phenotype) {
+				best = bestGenotypeOfIsland[i];
+			}
+		}
+		return best;
 	}
-
-	private void migrate(){}
 
 	private void select(SelectionMethod selectionMethod){
 		for (int k = 0; k < islandsNumber; k++) {
 			switch (selectionMethod){
-				case RULET_SELECTION -> candidates[k] = SelectionAlgorithm.rouletteSelection(genotypes[k], populationSize);
+				case ROULETTE_SELECTION -> candidates[k] = SelectionAlgorithm.rouletteSelection(genotypes[k], populationSize);
 				case TOURNAMENT_SELECTION -> candidates[k] = SelectionAlgorithm.tournamentSelection(genotypes[k], populationSize);
 				default -> candidates[k] = SelectionAlgorithm.randomSelection(populationSize);
 			}
@@ -149,25 +143,6 @@ public class GeneticAlgorithm {
 			}
 		}
 		findBest();
-		for (int i = 0; i < islandsNumber; i++) {
-			boolean[] arr = new boolean[genotypes[i][0].genotype.length];
-			System.out.println(Arrays.toString(bestGenotypeOfIsland[i].genotype));
-			System.out.println(matrix.distance(bestGenotypeOfIsland[i].genotype));
-			for (int k = 0; k < bestGenotypeOfIsland[i].genotype.length; k++) {
-				arr[bestGenotypeOfIsland[i].genotype[k] - 1] = true;
-			}
-			for (int k = 0; k < bestGenotypeOfIsland[i].genotype.length; k++) {
-				if (!arr[k]) {
-					for (int l = 0; l < 50; l++) {
-						System.out.println("dupa\n");
-					}
-				}
-			}
-			System.out.println();
-		}
-		System.out.println();
-		System.out.println();
-		System.out.println();
 	}
 
 	private void bridge() {
@@ -184,12 +159,11 @@ public class GeneticAlgorithm {
 			swap(islandRepresentation, islandsNumber - 2 * pair - 2, j);
 		}
 		interIslandConnection(islandRepresentation);
-		System.out.println("Bridge");
 	}
 
 	private void interIslandConnection(int[] islandRepresentation) {
 		for (int i = islandRepresentation.length - 1; i > 0; i -= 2) {
-			for (int j = 0; j < populationSize; j += 2){
+			for (int j = 0; j < populationSize; j += 4){
 				Genotype tmpGenotype = genotypes[islandRepresentation[i]][j];
 				genotypes[islandRepresentation[i]][j] = genotypes[islandRepresentation[i - 1]][j];
 				genotypes[islandRepresentation[i - 1]][j] = tmpGenotype;
@@ -257,15 +231,16 @@ public class GeneticAlgorithm {
 
 	private void mutation(MutationMethod method, int k, int i){
 
-		MutationMethod[] methods = {MutationMethod.SWAP, MutationMethod.INSERT, MutationMethod.INVERT};
+		MutationMethod[] methods = {MutationMethod.RANDOM_SWAPS, MutationMethod.INSERT, MutationMethod.INVERT, MutationMethod.NEAREST_NEIGHBOUR};
 
 		if (method == MutationMethod.RANDOM) {
-			method = methods[random.nextInt(3)];
+			method = methods[random.nextInt(4)];
 		}
 
 		problemSolver.setSolution(genotypes[k][i].genotype);
 		for (int iteration = random.nextInt(mutationLimit); iteration >= 0; iteration--)
 			switch (method) {
+				case RANDOM_SWAPS -> MutationAlgorithm.randomSwaps(genotypes[k][i].genotype);
 				case SWAP -> problemSolver.swap(false);
 				case INSERT -> problemSolver.insert(false);
 				case NEAREST_NEIGHBOUR -> MutationAlgorithm.nearestNeighbourMutationAlgorithm(genotypes[k][i].genotype, matrix);
@@ -288,19 +263,28 @@ public class GeneticAlgorithm {
 
 	private void deathZone(LifeIsBrutalMethod method) {
 		for (int i = 0; i < islandsNumber; i++){
-			if (method == LifeIsBrutalMethod.AGE_ELIMINATING) {
-				LifeIsBrutalAlgorithm.ageEliminating(genotypes[i], populationSize + numbersOfChildren[i]);
-			} else {
-				LifeIsBrutalAlgorithm.randomEliminating(genotypes[i], populationSize + numbersOfChildren[i]);
+			switch (method) {
+				case AGE_ELIMINATING -> LifeIsBrutalAlgorithm.ageEliminating(genotypes[i], populationSize + numbersOfChildren[i]);
+				case ELITE_PROTECTION -> LifeIsBrutalAlgorithm.eliteProtection(genotypes[i], populationSize + numbersOfChildren[i]);
+				default -> LifeIsBrutalAlgorithm.randomEliminating(genotypes[i], populationSize + numbersOfChildren[i]);
 			}
 		}
 	}
 
 	public static void main(String[] args) {
 		try {
-			Matrix matrix = FileManager.readFile("data/ALL_tsp/berlin52.tsp");
-			GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(matrix, 300, 6);
-			geneticAlgorithm.start(GeneratingPopulationMethod.SWAP_GENERATION, SelectionMethod.TOURNAMENT_SELECTION,CrossingMethod.PMX,MutationMethod.SWAP,LifeIsBrutalMethod.RANDOM_ELIMINATING);
+			String dir = "bestTsp/";
+			String[] tspFiles = {"eil51.tsp", "ch150.tsp", /*"berlin52.tsp", "ch130.tsp" ,"kroA200.tsp", "bays29.tsp", "d198.tsp", "eil101.tsp"*/};
+			String[] atspFiles = {"ft53.atsp", "ft70.atsp", "ftv33.atsp", "ftv170.atsp", "ry48p.atsp", "rbg323.atsp", "kro124p.atsp", "ftv64.atsp"};
+			for (String name : tspFiles) {
+				PrintStream ps = new PrintStream(new FileOutputStream(dir + name + ".csv"));
+				System.setOut(ps);
+				Matrix matrix = FileManager.readFile("data/ALL_tsp/" + name);
+				GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(matrix, 300, 6);
+//				geneticAlgorithm.start(GeneratingPopulationMethod.TWO_OPT_GENERATION, SelectionMethod.RANDOM_SELECTION, CrossingMethod.CX,MutationMethod.INVERT, LifeIsBrutalMethod.AGE_ELIMINATING);
+				geneticAlgorithm.start(GeneratingPopulationMethod.RANDOM_GENERATION, SelectionMethod.TOURNAMENT_SELECTION, CrossingMethod.CX, MutationMethod.NEAREST_NEIGHBOUR, LifeIsBrutalMethod.AGE_ELIMINATING);
+				ps.close();
+			}
 		} catch (FileNotFoundException | WrongFileFormatException e) {
 			e.printStackTrace();
 		}

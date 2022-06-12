@@ -22,7 +22,7 @@ public class Experiment {
 			int [] islandsNumbers = {/*2,4,*/6};
 			PrintStream stdout = System.out;
 			PrintStream ps;
-			String dir = arr[1].equals("tsp") ? "TSP_solo" : "ATSP_solo";
+			String dir = arr[1].equals("tsp") ? "TSP_solo/" : "ATSP_solo/";
 			for (int populationSize : populationSizes) {
 				for (int islandsNumber : islandsNumbers) {
 					GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm(matrix, populationSize, islandsNumber);

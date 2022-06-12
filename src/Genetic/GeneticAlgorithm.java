@@ -62,7 +62,6 @@ public class GeneticAlgorithm {
 		int iterationCounter = 0;
 		while (System.currentTimeMillis() <= startTime + time) {
 			allMakeOlder();
-			long t = System.currentTimeMillis();
 			select(selectionMethod);
 			cross(crossingMethod);
 			mutate(mutationMethod);
@@ -221,6 +220,11 @@ public class GeneticAlgorithm {
 				genotypes[k][2 * pair + populationSize].setGenotype(tempDouble[0]);
 				genotypes[k][2 * pair + 1 + populationSize].setGenotype(tempDouble[1]);
 			}
+			case NEAREST_NEIGHBOUR -> {
+				tempDouble = CrossingAlgorithms.nearestNeighbourCross(genotypes[k][i].genotype, genotypes[k][j].genotype, matrix);
+				genotypes[k][2 * pair + populationSize].setGenotype(tempDouble[0]);
+				genotypes[k][2 * pair + 1 + populationSize].setGenotype(tempDouble[1]);
+			}
 			default -> { //PMX
 				temp = CrossingAlgorithms.PMX(genotypes[k][i].genotype, genotypes[k][j].genotype);
 				genotypes[k][2 * pair + populationSize].genotype = CrossingAlgorithms.PMX(genotypes[k][j].genotype, genotypes[k][i].genotype);
@@ -272,6 +276,7 @@ public class GeneticAlgorithm {
 	}
 
 	public static void main(String[] args) {
+
 		try {
 			String dir = "bestTsp/";
 			String[] tspFiles = {"eil51.tsp", "ch150.tsp", /*"berlin52.tsp", "ch130.tsp" ,"kroA200.tsp", "bays29.tsp", "d198.tsp", "eil101.tsp"*/};
